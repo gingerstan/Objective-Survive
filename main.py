@@ -1,5 +1,6 @@
 import random
 import pygame as py
+import math as m
 from python_event_bus import EventBus
 from input_handler import InputHandler
 from ability_handler import *
@@ -31,7 +32,7 @@ class Game:
 
 	def game_loop(self):
 		abil_handler = AbilityHandler()
-		threats = ThreatHandler()
+		threat_handler = ThreatHandler()
 		
 		for ABIL in ALL_ABILS: # ALL_ABILS defined in ability_handler.py
 			ABIL.KEYS = self.inputs
@@ -52,17 +53,29 @@ class Game:
 				debug_count += 1
 			else:
 				debug_count = 0
-				self.spawn_asteroids(threats)
-				# print("==============")
+				self.spawn_asteroids(threat_handler)
+				
+			# need loop to check each asteroid against every ability.
+			# make collision checking a function.
+			for threat in threat_handler.threats:
+				for missile in abil_handler.active_abils:
+					missile.rect.scale_by_ip(0.7) # some trig function to scale rect correctly
+					# py.draw.rect(self.screen,(255,255,255),missile.rect)
+					dist = m.sqrt((threat.blit_pos[0] - missile.rect.center[0])**2 + (threat.blit_pos[1] - missile.rect.center[1])**2)
+					if missile.rect.colliderect(threat.rect):
+						print("hit!")
+						threat_handler.threats.remove(threat)
+						abil_handler.active_abils.remove(missile)
+						break
 
 
 			Timer.update_timers()
 
 			abil_handler.update()
-			threats.update()
+			threat_handler.update()
 
 			abil_handler.draw(self.screen)
-			threats.draw(self.screen)
+			threat_handler.draw(self.screen)
 			
 			self.inputs.update()
 			py.display.update()

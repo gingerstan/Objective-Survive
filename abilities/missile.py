@@ -24,6 +24,9 @@ class Missile(py.sprite.Sprite):
 		self.angle = m.degrees(m.atan2(dy,dx)) - 90 # in degrees
 		self.img = py.transform.rotate(self.img, self.angle)
 
+		self.rect = self.img.get_rect()
+		self.rect.center = self.pos
+
 	def update(self):
 		if self.pos[0] > 1100 or self.pos[0] < -100:
 			return False

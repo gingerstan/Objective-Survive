@@ -27,11 +27,16 @@ class InputHandler:
 			if event.type == py.MOUSEBUTTONUP:
 				if not py.mouse.get_pressed()[0]:
 					self.left_mouse = False
-					EventBus.call("left_click")
 				if not py.mouse.get_pressed()[2]:
 					self.right_mouse = False
 
 		self.mouse_pos = py.mouse.get_pos()
+
+		if not self.left_mouse and self.left_mouse_prev:
+			EventBus.call("left_click")
+
+		if not self.right_mouse and self.right_mouse_prev:
+			EventBus.call("right_click")
 
 	def left_click(self):
 		return not self.left_mouse and self.left_mouse_prev 

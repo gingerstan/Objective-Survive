@@ -14,19 +14,25 @@ class ThreatHandler:
 
 	def draw(self, screen):
 		for threat in self.threats:
-			py.draw.rect(screen,(255,255,255), threat.rect)
+			# py.draw.rect(screen,(255,255,255), threat.rect)
+			# screen.blit(threat.img, threat.blit_pos)
 			screen.blit(threat.img, threat.blit_pos)
 
 
 class Normal(py.sprite.Sprite):
 	def __init__(self, pos, hp, dx, dy, img):
 		self.pos = pos.copy()
+		self.blit_pos = pos.copy()
 		self.hp = hp
 		self.dx = dx 
 		self.dy = dy
 		self.img = img
 
+		self.rect = self.img.get_rect()
+		self.rect.center = self.pos
+
 		self.score = (dx + dy)*10 + hp
+
 
 	def update(self):
 		if self.pos[0] > 1100 or self.pos[0] < -100:

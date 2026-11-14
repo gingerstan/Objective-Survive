@@ -14,7 +14,7 @@ class AbilityHandler:
 
 	def draw(self, screen):
 		for abil in self.active_abils:
-			py.draw.rect(screen,(255,255,255), abil.rect)
+			#py.draw.rect(screen,(255,255,255), abil.rect)
 			screen.blit(abil.img, abil.blit_pos)
 
 
