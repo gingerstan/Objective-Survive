@@ -10,6 +10,12 @@ class InputHandler:
 		self.right_mouse = False
 		self.right_mouse_prev = False
 
+		self.space = False
+		self.space_prev = False
+
+		self.shift = False
+		self.shift_prev = False
+
 		self.mouse_pos = (0,0)
 
 	def keys(self):
@@ -17,6 +23,18 @@ class InputHandler:
 			if event.type == QUIT:
 				py.quit()
 				sys.exit()
+
+			if event.type == py.KEYDOWN:
+				if event.key == py.K_SPACE:
+					self.space = True
+				if event.key == py.K_LSHIFT:
+					self.shift = True
+		
+			if event.type == py.KEYUP:
+				if event.key == py.K_SPACE:
+					self.space = False
+				if event.key == py.K_LSHIFT:
+					self.shift = False
 
 			if event.type == py.MOUSEBUTTONDOWN:
 				if py.mouse.get_pressed()[0]:
@@ -38,6 +56,12 @@ class InputHandler:
 		if not self.right_mouse and self.right_mouse_prev:
 			EventBus.call("right_click")
 
+		if not self.space and self.space_prev:
+			EventBus.call("space_click")
+
+		if not self.shift and self.shift_prev:
+			EventBus.call("shift_click")
+
 	def left_click(self):
 		return not self.left_mouse and self.left_mouse_prev 
 
@@ -47,3 +71,5 @@ class InputHandler:
 	def update(self):
 		self.left_mouse_prev = self.left_mouse
 		self.right_mouse_prev = self.right_mouse
+		self.space_prev = self.space
+		self.shift_prev = self.shift

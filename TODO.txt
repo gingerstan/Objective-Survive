@@ -1,4 +1,16 @@
-1) adjust hit boxes
-2) scoring
-3) player health
-4) game timer
+scoreboard
+player health
+game timer
+increasing difficulty
+better GUI
+- Ammunition recharge bar
+- missile magazine state
+- planet health bar
+more abilities
+- tracking missile
+- planetary shield
+- auto laser cannons (low damage / range)
+
+
+alien ship boss
+- flies around erratically and shoots projectiles at Earth

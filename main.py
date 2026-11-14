@@ -9,6 +9,9 @@ from asteroid import Normal
 from timer import Timer
 
 from load_assets import bg_img
+from load_assets import bar_img
+from load_assets import speed_upgrade_img
+from load_assets import radius_upgrade_img
 from load_assets import aster_img
 from load_assets import rubble_img
 from load_assets import metal_img
@@ -33,50 +36,69 @@ class Game:
 	def game_loop(self):
 		abil_handler = AbilityHandler()
 		threat_handler = ThreatHandler()
+		pause = False
 		
 		for ABIL in ALL_ABILS: # ALL_ABILS defined in ability_handler.py
 			ABIL.KEYS = self.inputs
 			ABIL.HANDLER = abil_handler
 
+		score = 0
 		debug_count = 0
 		in_game = True
 		while in_game:
 			self.screen.fill((0,0,0))
 			self.screen.blit(bg_img,(0,0))
-			
+			self.screen.blit(bar_img,(0,800))
+			self.screen.blit(speed_upgrade_img,(50,830))
+			self.screen.blit(radius_upgrade_img,(50,900))
 			self.inputs.keys()
-			
-			py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
+
+			if self.inputs.mouse_pos[1] < 800:
+				py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
 		
+			# pauses entities so player can use upgrade menu ##########################
+			if not self.inputs.shift:
 
-			if debug_count < 240:
-				debug_count += 1
+				if debug_count < 240:
+					debug_count += 1
+				else:
+					debug_count = 0
+					self.spawn_asteroids(threat_handler)
+					print(score)
+					
+				# need loop to check each asteroid against every ability.
+				# make collision checking a function.
+				for threat in threat_handler.threats:
+					for missile in abil_handler.active_abils:
+						missile.rect.scale_by_ip(Missile.RADIUS) # some trig function to scale rect correctly
+						# py.draw.rect(self.screen,(255,255,255),missile.rect)
+						dist = m.sqrt((threat.blit_pos[0] - missile.rect.center[0])**2 + (threat.blit_pos[1] - missile.rect.center[1])**2)
+						if missile.rect.colliderect(threat.rect):
+							score += threat.score
+							threat_handler.threats.remove(threat)
+							abil_handler.active_abils.remove(missile)
+							break
+
+			
+				Timer.update_timers()
+				abil_handler.update()
+				threat_handler.update()
 			else:
-				debug_count = 0
-				self.spawn_asteroids(threat_handler)
-				
-			# need loop to check each asteroid against every ability.
-			# make collision checking a function.
-			for threat in threat_handler.threats:
-				for missile in abil_handler.active_abils:
-					missile.rect.scale_by_ip(0.7) # some trig function to scale rect correctly
-					# py.draw.rect(self.screen,(255,255,255),missile.rect)
-					dist = m.sqrt((threat.blit_pos[0] - missile.rect.center[0])**2 + (threat.blit_pos[1] - missile.rect.center[1])**2)
-					if missile.rect.colliderect(threat.rect):
-						print("hit!")
-						threat_handler.threats.remove(threat)
-						abil_handler.active_abils.remove(missile)
-						break
+				speed_rect = py.Rect(50,830,150,50)
+				radius_rect = py.Rect(50,900,150,50)
+
+				if speed_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
+					EventBus.call("upgrade_speed")
+
+				if radius_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
+					EventBus.call("upgrade_radius")
 
 
-			Timer.update_timers()
-
-			abil_handler.update()
-			threat_handler.update()
+			# end menu pause ##########################################################
 
 			abil_handler.draw(self.screen)
 			threat_handler.draw(self.screen)
-			
+				
 			self.inputs.update()
 			py.display.update()
 			self.clock.tick(120)

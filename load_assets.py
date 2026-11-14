@@ -5,6 +5,15 @@ white = (255,255,255)
 bg_img = py.image.load("assets/battlefield.png")
 bg_img.set_colorkey(white)
 
+bar_img = py.image.load("assets/upgrade_bar.png")
+bar_img.set_colorkey(white)
+
+speed_upgrade_img = py.image.load("assets/upgrade_speed.png")
+speed_upgrade_img.set_colorkey(white)
+
+radius_upgrade_img = py.image.load("assets/upgrade_radius.png")
+radius_upgrade_img.set_colorkey(white)
+
 nuke_img = py.image.load("assets/nuke.png")
 nuke_img.set_colorkey(white)
 nuke_img = py.transform.scale_by(nuke_img, 0.5)
