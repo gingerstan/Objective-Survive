@@ -57,4 +57,4 @@ class Normal(py.sprite.Sprite):
 
 
 
-
+ALL_THREATS = [Normal]

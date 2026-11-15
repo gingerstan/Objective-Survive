@@ -1,12 +1,10 @@
 import random
 import pygame as py
 import math as m
-from python_event_bus import EventBus
 from input_handler import InputHandler
 from ability_handler import *
-from asteroid import ThreatHandler
-from asteroid import Normal
-from timer import Timer
+from asteroid import *
+from timer import *
 
 from load_assets import bg_img
 from load_assets import bar_img
@@ -24,6 +22,7 @@ class Game:
 		py.display.set_caption("Objective: Survive")
 		self.screen = py.display.set_mode((1000,1000), 0, 32)
 		self.inputs = InputHandler()
+		self.framerate = 120
 
 
 	def main_loop(self):
@@ -34,15 +33,21 @@ class Game:
 
 
 	def game_loop(self):
-		abil_handler = AbilityHandler()
-		threat_handler = ThreatHandler()
-		pause = False
+		vars = self.RoundVariables()
+		vars.abil_handler = AbilityHandler()
+		vars.threat_handler = ThreatHandler()
+		frames = 0
+		spawn_timer = EventTimer(180,"spawn_asteroid")
+		spawn_update_rate_timer = EventTimer(120,"update_spawn_rate",spawn_timer.period, frames)
 		
+
 		for ABIL in ALL_ABILS: # ALL_ABILS defined in ability_handler.py
 			ABIL.KEYS = self.inputs
-			ABIL.HANDLER = abil_handler
+			ABIL.HANDLER = vars.abil_handler
 
-		score = 0
+		for THREAT in ALL_THREATS: # ALL_THREATS defined in asteroid.py
+			THREAT.HANDLER = vars.threat_handler
+
 		debug_count = 0
 		in_game = True
 		while in_game:
@@ -52,6 +57,7 @@ class Game:
 			self.screen.blit(speed_upgrade_img,(50,830))
 			self.screen.blit(radius_upgrade_img,(50,900))
 			self.inputs.keys()
+			# print(frames)
 
 			if self.inputs.mouse_pos[1] < 800:
 				py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
@@ -59,49 +65,61 @@ class Game:
 			# pauses entities so player can use upgrade menu ##########################
 			if not self.inputs.shift:
 
-				if debug_count < 240:
+				if debug_count < 120:
 					debug_count += 1
 				else:
 					debug_count = 0
-					self.spawn_asteroids(threat_handler)
-					print(score)
 					
-				# need loop to check each asteroid against every ability.
-				# make collision checking a function.
-				for threat in threat_handler.threats:
-					for missile in abil_handler.active_abils:
-						missile.rect.scale_by_ip(Missile.RADIUS) # some trig function to scale rect correctly
-						# py.draw.rect(self.screen,(255,255,255),missile.rect)
-						dist = m.sqrt((threat.blit_pos[0] - missile.rect.center[0])**2 + (threat.blit_pos[1] - missile.rect.center[1])**2)
-						if missile.rect.colliderect(threat.rect):
-							score += threat.score
-							threat_handler.threats.remove(threat)
-							abil_handler.active_abils.remove(missile)
-							break
 
-			
+				self.check_collisions(vars)
+
 				Timer.update_timers()
-				abil_handler.update()
-				threat_handler.update()
+				vars.abil_handler.update()
+				vars.threat_handler.update()
 			else:
-				speed_rect = py.Rect(50,830,150,50)
-				radius_rect = py.Rect(50,900,150,50)
-
-				if speed_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
-					EventBus.call("upgrade_speed")
-
-				if radius_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
-					EventBus.call("upgrade_radius")
+				self.check_buttons()
 
 
 			# end menu pause ##########################################################
 
-			abil_handler.draw(self.screen)
-			threat_handler.draw(self.screen)
+			vars.abil_handler.draw(self.screen)
+			vars.threat_handler.draw(self.screen)
 				
 			self.inputs.update()
 			py.display.update()
-			self.clock.tick(120)
+			frames += 1
+			self.clock.tick(self.framerate)
+
+	@EventBus.on("update_spawn_rate")
+	def update_spawn_rate(args):
+		 # period = args[0]
+		 # period = (args[1]) + 180
+		 pass
+		 
+		
+
+
+	def check_collisions(self, vars):
+		for threat in vars.threat_handler.threats:
+			for missile in vars.abil_handler.active_abils:
+				missile.rect.scale_by_ip(Missile.RADIUS) # some trig function to scale rect correctly
+				# py.draw.rect(self.screen,(255,255,255),missile.rect)
+				dist = m.sqrt((threat.blit_pos[0] - missile.rect.center[0])**2 + (threat.blit_pos[1] - missile.rect.center[1])**2)
+				if missile.rect.colliderect(threat.rect):
+					vars.score += threat.score
+					vars.threat_handler.threats.remove(threat)
+					vars.abil_handler.active_abils.remove(missile)
+					break
+
+
+	def check_buttons(self):
+		speed_rect = py.Rect(50,830,150,50)
+		radius_rect = py.Rect(50,900,150,50)
+
+		if speed_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
+			EventBus.call("upgrade_speed")
+		elif radius_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
+			EventBus.call("upgrade_radius")
 
 
 	def main_menu(self):
@@ -111,8 +129,8 @@ class Game:
 	def end_screen(self):
 		pass
 
-
-	def spawn_asteroids(self, threats):
+	@EventBus.on("spawn_asteroid")
+	def spawn_asteroids():
 		# add new functions later to have different spawn configurations
 		a = [
 			{"pos" : [500,50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : aster_img },
@@ -126,8 +144,13 @@ class Game:
 
 		r = random.choice(a)
 		ast = Normal(r["pos"],r["hp"],r["dx"],r["dy"],r["img"])
-		threats.add(ast)
+		Normal.HANDLER.add(ast)
 
+	class RoundVariables:
+		def __init__(self):
+			self.abil_handler = None
+			self.threat_handler = None
+			self.score = 0
 
 
 

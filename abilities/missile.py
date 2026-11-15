@@ -11,7 +11,7 @@ class Missile(py.sprite.Sprite):
 
 		self.pos = pos.copy()
 		self.img = img
-		self.blit_pos = pos
+		
 
 		x = Missile.KEYS.mouse_pos[0]
 		y = Missile.KEYS.mouse_pos[1]
@@ -26,8 +26,15 @@ class Missile(py.sprite.Sprite):
 		self.angle = m.degrees(m.atan2(dy,dx)) - 90 # in degrees
 		self.img = py.transform.rotate(self.img, self.angle)
 
-		self.rect = self.img.get_rect()
-		self.rect.center = self.pos
+		rect_width = int(img.get_width()) / 2
+		rect_height = int(img.get_height()) / 2
+
+		j = pos[0] - rect_width
+		k = pos[1] - rect_height
+
+		self.rect = img.get_rect()
+		self.rect.center = pos
+		self.blit_pos = [j,k]
 
 	def update(self):
 		if self.pos[0] > 1100 or self.pos[0] < -100:

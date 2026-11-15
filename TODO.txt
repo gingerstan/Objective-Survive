@@ -6,6 +6,7 @@ better GUI
 - Ammunition recharge bar
 - missile magazine state
 - planet health bar
+explosion animation, missile engine animation
 more abilities
 - tracking missile
 - planetary shield
