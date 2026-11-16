@@ -8,6 +8,9 @@ bg_img.set_colorkey(white)
 icon_img = py.image.load("assets/IconV1.png")
 icon_img.set_colorkey(white)
 
+loser_img = py.image.load("assets/loser.png")
+loser_img.set_colorkey(white)
+
 bar_img = py.image.load("assets/upgrade_bar.png")
 bar_img.set_colorkey(white)
 
@@ -29,3 +32,6 @@ rubble_img.set_colorkey(white)
 
 metal_img = py.image.load("assets/Metal.png")
 metal_img.set_colorkey(white)
+
+diff_img = py.image.load("assets/diff.png")
+diff_img.set_colorkey(white)

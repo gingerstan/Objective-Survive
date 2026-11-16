@@ -10,6 +10,15 @@ def load_image_sequence(seq_prefix, num_of_frames,colorkey=(255,255,255)):
 
 	return frame_array
 
+def load_number_sequence():
+	frame_array = []
+	for i in range(10):
+		frame = py.image.load(f"assets/{i}.png")
+		frame.set_colorkey(white)
+		frame_array.append(frame)
+
+	return frame_array
+
 class Animation:
 	ALL_ANIMATIONS = []
 

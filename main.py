@@ -3,12 +3,16 @@ import logging
 import pygame as py
 import math as m
 from input_handler import InputHandler
+from input_handler import GameStates
 from ability_handler import *
 from asteroid import *
 from timer import *
 from animation import Animation
+from animation import load_image_sequence
+from animation import load_number_sequence
 from round_variables import RoundVariables
 from game_configs.difficulty_configs import *
+from gui import Button
 
 from load_assets import bg_img
 from load_assets import bar_img
@@ -18,6 +22,7 @@ from load_assets import aster_img
 from load_assets import rubble_img
 from load_assets import metal_img
 from load_assets import icon_img
+from load_assets import loser_img
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -36,7 +41,8 @@ class Game:
 		py.display.set_caption("Objective: Survive")
 		self.screen = py.display.set_mode((1000,1000), 0, 32)
 		self.inputs = InputHandler()
-		self.framerate = 120	
+		self.framerate = 120
+		self.score = 0
 
 
 	def main_loop(self):
@@ -47,9 +53,12 @@ class Game:
 
 
 	def game_loop(self):
-		vars = RoundVariables()
+		vars = RoundVariables(self.inputs.difficulty)
 		vars.abil_handler = AbilityHandler()
 		vars.threat_handler = ThreatHandler()
+		self.score = 0
+
+		Missile.set_diff_modifiers(self.inputs.difficulty)
 		
 		spawn_timer = EventTimer(180,"spawn_asteroid")
 		spawn_update_rate_timer = EventTimer(120,"update_spawn_rate",spawn_timer,vars)
@@ -62,6 +71,7 @@ class Game:
 		for THREAT in ALL_THREATS: # ALL_THREATS defined in asteroid.py
 			THREAT.HANDLER = vars.threat_handler
 
+		self.inputs.state = GameStates.IN_GAME
 
 		debug_count = 0
 		in_game = True
@@ -72,25 +82,26 @@ class Game:
 
 			if self.inputs.mouse_pos[1] < 800:
 				py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
+
+			self.display_score(False)
 		
 			# pauses entities so player can use upgrade menu ##########################
 			if not self.inputs.shift:
-
-				if debug_count < 120:
-					debug_count += 1
-				else:
-					debug_count = 0
+				# if debug_count < 120:
+				# 	debug_count += 1
+				# else:
+				# 	debug_count = 0
 					
-
 				self.check_collisions(vars)
 
 				Timer.update_timers()
 				vars.abil_handler.update()
 				vars.threat_handler.update()
+				vars.frames += 1
 
 				if vars.planet_health < 1:
 					in_game = False
-					logger.info(f"Scored: {vars.score}") # add length / difficulty of game to stats
+					logger.info(f"Scored: {self.score}") # add length / difficulty / abilities used in game to stats
 			else:
 				# check buttons now handled on BusEvent "left_click"
 				pass
@@ -106,7 +117,6 @@ class Game:
 				
 			self.inputs.update()
 			py.display.update()
-			vars.frames += 1
 			self.clock.tick(self.framerate)
 
 
@@ -135,7 +145,7 @@ class Game:
 				# py.draw.rect(self.screen,(255,255,255),missile.rect)
 				dist = m.sqrt((threat.blit_pos[0] - missile.rect.center[0])**2 + (threat.blit_pos[1] - missile.rect.center[1])**2)
 				if missile.rect.colliderect(threat.rect):
-					vars.score += threat.score
+					self.score += int(threat.score)
 					vars.threat_handler.threats.remove(threat)
 					vars.abil_handler.active_abils.remove(missile)
 					Animation("death",11,7,self.screen,missile.pos, scale=Missile.RADIUS)
@@ -144,7 +154,7 @@ class Game:
 
 
 	@EventBus.on("left_click")
-	def check_buttons(inputs):
+	def check_game_buttons(inputs):
 		if inputs.shift:
 			speed_rect = py.Rect(50,830,150,50)
 			radius_rect = py.Rect(50,900,150,50)
@@ -153,14 +163,25 @@ class Game:
 				EventBus.call("upgrade_speed")
 			elif radius_rect.collidepoint(inputs.mouse_pos):
 				EventBus.call("upgrade_radius")
-
+		else:
+			pass
 
 	def main_menu(self):
+		self.inputs.state = GameStates.MENU
+		nums = load_number_sequence()
+
+		Button.KEYS = self.inputs
+
 		in_menu = True
 		while in_menu:
 			self.screen.fill((0,0,0))
 			self.screen.blit(icon_img,(0,0))
 			self.inputs.keys()
+
+			Button.update()
+
+			Button.ALL_BUTTONS[0].img = nums[self.inputs.difficulty]
+			Button.draw(self.screen)
 
 			if self.inputs.space_bar_click():
 				in_menu = False
@@ -170,10 +191,53 @@ class Game:
 			self.clock.tick(self.framerate)
 
 
-
-
 	def end_screen(self):
-		pass
+		in_end = True
+		frames = 0
+		while in_end:
+			self.screen.fill((0,0,0))
+			self.screen.blit(loser_img,(0,0))
+
+			self.display_score(True)
+
+			if frames > 700:
+				in_end = False
+
+			frames += 1
+			py.display.update()
+			self.clock.tick(self.framerate)
+
+	def display_score(self,end):
+		nums = load_number_sequence()
+		str_score = str(self.score)
+
+		if end:
+			y = 450
+			x = 600
+			dist = 100
+		else:
+			y = 10
+			x = 600
+			dist = 70
+
+		digit = 0
+		for i in str_score:
+			pos = [(x + (digit*dist)), y]
+			if end:
+				img = py.transform.scale_by(nums[int(i)], 1.3)
+			else:
+				img = nums[int(i)]
+			self.screen.blit(img, pos)
+			digit += 1
+
+
+	@EventBus.on("update_difficulty")
+	def update_difficulty(inputs):
+		if inputs.difficulty < 5:
+			inputs.difficulty += 1
+		elif inputs.difficulty == 5:
+			inputs.difficulty = 1
+
 
 	@EventBus.on("spawn_asteroid")
 	def spawn_asteroids():
@@ -191,6 +255,9 @@ class Game:
 		r = random.choice(a)
 		ast = Normal(r["pos"],r["hp"],r["dx"],r["dy"],r["img"])
 		Normal.HANDLER.add(ast)
+
+	
+
 
 
 

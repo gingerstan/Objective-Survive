@@ -1,5 +1,6 @@
 from abilities.ability_imports import *
 from load_assets import nuke_img
+from game_configs.difficulty_configs import diff_configs
 
 class Missile(py.sprite.Sprite):
 	TIMER = Timer(120)
@@ -38,6 +39,12 @@ class Missile(py.sprite.Sprite):
 		self.rect.center = pos
 		self.blit_pos = [j,k]
 
+	def set_diff_modifiers(diff):
+		level = diff_configs[diff]
+		Missile.TIMER = Timer(level["missiles"]["cooldown"])
+		Missile.RADIUS = level["missiles"]["radius"]
+		Missile.SPEED = level["missiles"]["speed"]
+
 	def update(self):
 		if self.pos[0] > 1100 or self.pos[0] < -100:
 			return False
@@ -64,7 +71,7 @@ class Missile(py.sprite.Sprite):
 	def launch_missile(inputs):
 		if not inputs.shift and not Missile.TIMER.active and inputs.mouse_pos[1] < 750:
 			Missile.TIMER.active = True
-			Missile.HANDLER.add(Missile(mouse_pos=inputs.mouse_pos))
+			Missile.HANDLER.add(Missile(inputs.mouse_pos))
 
 	@EventBus.on("upgrade_radius")
 	def upgrade_missile_radius():
@@ -74,13 +81,11 @@ class Missile(py.sprite.Sprite):
 	def upgrade_missile_speed():
 		Missile.SPEED += 0.3
 
-	
 
-
-# @EventBus.on("left_click")
-# def launch_missile():
-# 	if not Missile.TIMER.active and Missile.KEYS.mouse_pos[1] < 700:
-# 		Missile.TIMER.active = True
-# 		Missile.HANDLER.add(Missile())
+	# @EventBus.on("left_click")
+	# def launch_missile(inputs):
+	# 	if not Missile.KEYS.shift and not Missile.TIMER.active and Missile.KEYS.mouse_pos[1] < 700:
+	# 		Missile.TIMER.active = True
+	# 		Missile.HANDLER.add(Missile())
 		
 		

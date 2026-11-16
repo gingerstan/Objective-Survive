@@ -1,9 +1,17 @@
 import pygame as py, sys
 from pygame.locals import QUIT
 from python_event_bus import EventBus
+from enum import Enum
+
+class GameStates(Enum):
+	MENU = 1
+	IN_GAME = 2
 
 class InputHandler:
 	def __init__(self):
+		self.state = GameStates.MENU
+		self.difficulty = 1
+
 		self.left_mouse = False
 		self.left_mouse_prev = False
 
@@ -17,6 +25,7 @@ class InputHandler:
 		self.shift_prev = False
 
 		self.mouse_pos = (0,0)
+
 
 	def keys(self):
 		for event in py.event.get():
@@ -51,7 +60,10 @@ class InputHandler:
 		self.mouse_pos = py.mouse.get_pos()
 
 		if not self.left_mouse and self.left_mouse_prev:
-			EventBus.call("left_click",self)
+			if self.state == GameStates.IN_GAME:
+				EventBus.call("left_click",self)
+			if self.state == GameStates.MENU:
+				EventBus.call("left_click_menu")
 
 		if not self.right_mouse and self.right_mouse_prev:
 			EventBus.call("right_click",self)

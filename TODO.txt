@@ -1,5 +1,4 @@
 scoreboard
-player health
 game timer
 better GUI
 - Ammunition recharge bar
@@ -12,6 +11,7 @@ more abilities
 - tracking missile
 - planetary shield
 - auto laser cannons (low damage / range)
+add little missile drawings to menu icon
 
 
 alien ship boss
