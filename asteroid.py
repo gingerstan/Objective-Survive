@@ -12,11 +12,11 @@ class ThreatHandler:
 	def update(self):
 		self.threats = [a for a in self.threats if a.update()]
 
-	def draw(self, screen):
+	def draw(self, blitQueue):
 		for threat in self.threats:
 			# py.draw.rect(screen,(255,255,255), threat.rect)
 			# screen.blit(threat.img, threat.blit_pos)
-			screen.blit(threat.img, threat.blit_pos)
+			blitQueue.append((threat.img,threat.blit_pos))
 
 
 class Normal(py.sprite.Sprite):

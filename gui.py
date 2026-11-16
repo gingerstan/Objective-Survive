@@ -7,6 +7,7 @@ from load_assets import diff_img
 
 class Button:
 	ALL_BUTTONS = []
+	KEYS = None  # assigned in Game.__init__
 
 	def __init__(self, pos, name, img,width=75,height=75):
 		Button.ALL_BUTTONS.append(self)

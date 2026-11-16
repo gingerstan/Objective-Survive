@@ -1,6 +1,52 @@
 import pygame as py
 white = (255,255,255)
 
+class Animation:
+	ALL_ANIMATIONS = []
+
+	def __init__(self, seq_prefix, screen, pos, colorkey=(255,255,255), scale=1):
+		Animation.ALL_ANIMATIONS.append(self)
+		seq = Animation.SEQUENCES[seq_prefix]
+
+		self.num_of_frames = seq["num_of_frames"]
+		self.frame_time = seq["frame_time"] # how many game frames one frame of the animation lasts for
+		self.screen = screen
+		self.frames = seq["frames"].copy()
+
+		if scale != 1:
+			for i in range(self.num_of_frames):
+				self.frames[i] = py.transform.scale_by(self.frames[i],scale)
+
+		self.frame_num = 0
+		self.sub_frame_num = 0
+
+		rect_width = int(self.frames[0].get_width()) / 2
+		rect_height = int(self.frames[1].get_height()) / 2
+
+		j = pos[0] - rect_width
+		k = pos[1] - rect_height
+
+		self.pos = (j,k)
+
+
+	def play(self, blitQueue):
+		if self.frame_num < self.num_of_frames:
+			blitQueue.append((self.frames[self.frame_num],self.pos))
+			if self.sub_frame_num < self.frame_time:
+				self.sub_frame_num += 1
+			else:
+				self.sub_frame_num = 0
+				self.frame_num += 1
+		else:
+			Animation.ALL_ANIMATIONS.remove(self)
+
+
+	def play_all(blitQueue):
+		for anim in Animation.ALL_ANIMATIONS:
+			anim.play(blitQueue)
+
+
+
 def load_image_sequence(seq_prefix, num_of_frames,colorkey=(255,255,255)):
 	frame_array = []
 	for i in range(num_of_frames):
@@ -19,59 +65,18 @@ def load_number_sequence():
 
 	return frame_array
 
-class Animation:
-	ALL_ANIMATIONS = []
+def load_all_sequences(sequences):
+	for name,array in sequences.items():
+		sequences[name]["frames"] = load_image_sequence("death",sequences[name]["num_of_frames"])
 
-	def __init__(self,seq_prefix,num_of_frames,frame_time,screen,pos,colorkey=(255,255,255),scale=1):
-		Animation.ALL_ANIMATIONS.append(self)
-		self.seq_prefix = seq_prefix
-		self.num_of_frames = num_of_frames
-		self.frame_time = frame_time # how many game frames one frame of the animation lasts for
-		self.screen = screen
+	return sequences
 
-		self.frames = load_image_sequence(seq_prefix,num_of_frames,colorkey=colorkey)
-
-		if scale != 1:
-			for i in range(num_of_frames):
-				self.frames[i] = py.transform.scale_by(self.frames[i],scale)
-
-		self.frame_num = 0
-		self.sub_frame_num = 0
-
-		rect_width = int(self.frames[0].get_width()) / 2
-		rect_height = int(self.frames[1].get_height()) / 2
-
-		j = pos[0] - rect_width
-		k = pos[1] - rect_height
-
-		self.pos = (j,k)
-
-
-	def play(self):
-		if self.frame_num < self.num_of_frames:
-			self.screen.blit(self.frames[self.frame_num],self.pos)
-			if self.sub_frame_num < self.frame_time:
-				self.sub_frame_num += 1
-			else:
-				self.sub_frame_num = 0
-				self.frame_num += 1
-			#print(f"frame:{self.frame_num}, sub-frame:{self.sub_frame_num}")
-		else:
-			Animation.ALL_ANIMATIONS.remove(self)
-
-
-	def play_all():
-		for anim in Animation.ALL_ANIMATIONS:
-			anim.play()
-		
-
-
-
-class LoopingAnimation(Animation):
-	def __init__(self,seq_prefix,num_of_frames,frame_time,screen,pos,colorkey=(255,255,255)):
-		super().__init__(seq_prefix,num_of_frames,frame_time,screen,pos,colorkey=(255,255,255))
-		pass
-
-class PyDrawAnimation:
-	def __init__(self):
-		pass
+# TODO: load sequences in from another file instead of here
+sequences = {
+	"death" : {
+		"frames" : [],
+		"num_of_frames" : 11,
+		"frame_time" : 7
+	}
+}
+Animation.SEQUENCES = load_all_sequences(sequences)

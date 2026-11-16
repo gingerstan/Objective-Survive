@@ -1,4 +1,4 @@
-scoreboard
+currency to make abilities cost something
 game timer
 better GUI
 - Ammunition recharge bar
@@ -7,6 +7,7 @@ better GUI
 animations
 - missile engine animation
 - planet impact animation
+- graphics to represent planet damage, like barren wasteland
 more abilities
 - tracking missile
 - planetary shield
@@ -20,6 +21,12 @@ alien ship boss
 boss asteroid
 - splits into multiple rubble when defeated
 
+comet event
+- use art from other game
+
 
 different game maps
 - varying difficulty
+
+
+Organize stuff

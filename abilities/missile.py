@@ -12,9 +12,6 @@ class Missile(py.sprite.Sprite):
 
 		self.pos = pos.copy()
 		self.img = img
-		
-		# x = Missile.KEYS.mouse_pos[0]
-		# y = Missile.KEYS.mouse_pos[1]
 
 		x = mouse_pos[0]
 		y = mouse_pos[1]
@@ -66,12 +63,11 @@ class Missile(py.sprite.Sprite):
 
 		return True
 
-
 	@EventBus.on("left_click")
 	def launch_missile(inputs):
 		if not inputs.shift and not Missile.TIMER.active and inputs.mouse_pos[1] < 750:
 			Missile.TIMER.active = True
-			Missile.HANDLER.add(Missile(inputs.mouse_pos))
+			Missile.HANDLER.add(Missile(Missile.KEYS.mouse_pos))
 
 	@EventBus.on("upgrade_radius")
 	def upgrade_missile_radius():
@@ -82,10 +78,6 @@ class Missile(py.sprite.Sprite):
 		Missile.SPEED += 0.3
 
 
-	# @EventBus.on("left_click")
-	# def launch_missile(inputs):
-	# 	if not Missile.KEYS.shift and not Missile.TIMER.active and Missile.KEYS.mouse_pos[1] < 700:
-	# 		Missile.TIMER.active = True
-	# 		Missile.HANDLER.add(Missile())
+	
 		
 		
