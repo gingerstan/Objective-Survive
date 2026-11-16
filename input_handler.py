@@ -51,10 +51,10 @@ class InputHandler:
 		self.mouse_pos = py.mouse.get_pos()
 
 		if not self.left_mouse and self.left_mouse_prev:
-			EventBus.call("left_click")
+			EventBus.call("left_click",self)
 
 		if not self.right_mouse and self.right_mouse_prev:
-			EventBus.call("right_click")
+			EventBus.call("right_click",self)
 
 		if not self.space and self.space_prev:
 			EventBus.call("space_click")

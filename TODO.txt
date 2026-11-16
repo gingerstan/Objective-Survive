@@ -1,12 +1,13 @@
 scoreboard
 player health
 game timer
-increasing difficulty
 better GUI
 - Ammunition recharge bar
 - missile magazine state
 - planet health bar
-explosion animation, missile engine animation
+animation class
+- explosion animation 
+- missile engine animation
 more abilities
 - tracking missile
 - planetary shield
@@ -15,3 +16,10 @@ more abilities
 
 alien ship boss
 - flies around erratically and shoots projectiles at Earth
+
+boss asteroid
+- splits into multiple rubble when defeated
+
+
+different game maps
+- varying difficulty
