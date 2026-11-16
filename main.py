@@ -1,4 +1,5 @@
 import random
+import logging
 import pygame as py
 import math as m
 from input_handler import InputHandler
@@ -6,6 +7,8 @@ from ability_handler import *
 from asteroid import *
 from timer import *
 from animation import Animation
+from round_variables import RoundVariables
+from game_configs.difficulty_configs import *
 
 from load_assets import bg_img
 from load_assets import bar_img
@@ -14,6 +17,16 @@ from load_assets import radius_upgrade_img
 from load_assets import aster_img
 from load_assets import rubble_img
 from load_assets import metal_img
+from load_assets import icon_img
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M",
+    filename="scores.log",  # Omit to print to the console instead
+    encoding="utf-8",
+)
+logger = logging.getLogger(__name__)
 
 
 class Game:
@@ -23,7 +36,7 @@ class Game:
 		py.display.set_caption("Objective: Survive")
 		self.screen = py.display.set_mode((1000,1000), 0, 32)
 		self.inputs = InputHandler()
-		self.framerate = 120
+		self.framerate = 120	
 
 
 	def main_loop(self):
@@ -34,7 +47,7 @@ class Game:
 
 
 	def game_loop(self):
-		vars = self.RoundVariables()
+		vars = RoundVariables()
 		vars.abil_handler = AbilityHandler()
 		vars.threat_handler = ThreatHandler()
 		
@@ -49,18 +62,13 @@ class Game:
 		for THREAT in ALL_THREATS: # ALL_THREATS defined in asteroid.py
 			THREAT.HANDLER = vars.threat_handler
 
-		# test_anim = Animation("death",11,10,self.screen,[500,500])
 
 		debug_count = 0
 		in_game = True
 		while in_game:
 			self.screen.fill((0,0,0))
 			self.screen.blit(bg_img,(0,0))
-			self.screen.blit(bar_img,(0,800))
-			self.screen.blit(speed_upgrade_img,(50,830))
-			self.screen.blit(radius_upgrade_img,(50,900))
 			self.inputs.keys()
-			# print(frames)
 
 			if self.inputs.mouse_pos[1] < 800:
 				py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
@@ -79,6 +87,10 @@ class Game:
 				Timer.update_timers()
 				vars.abil_handler.update()
 				vars.threat_handler.update()
+
+				if vars.planet_health < 1:
+					in_game = False
+					logger.info(f"Scored: {vars.score}") # add length / difficulty of game to stats
 			else:
 				# check buttons now handled on BusEvent "left_click"
 				pass
@@ -86,9 +98,9 @@ class Game:
 
 			# end menu pause ##########################################################
 
-			for anim in Animation.ALL_ANIMATIONS:
-				anim.play()
 
+			Animation.play_all()
+			self.draw_gui(vars)
 			vars.abil_handler.draw(self.screen)
 			vars.threat_handler.draw(self.screen)
 				
@@ -96,6 +108,14 @@ class Game:
 			py.display.update()
 			vars.frames += 1
 			self.clock.tick(self.framerate)
+
+
+	def draw_gui(self,vars):
+		self.screen.blit(bar_img,(0,800))
+		self.screen.blit(speed_upgrade_img,(50,830))
+		self.screen.blit(radius_upgrade_img,(50,900))
+		py.draw.rect(self.screen,(255,0,0),(850,900,vars.planet_health * vars.hp_gui_factor,75))
+
 
 	@EventBus.on("update_spawn_rate")
 	def update_spawn_rate(args):
@@ -107,7 +127,7 @@ class Game:
 			if threat.pos[1] > 750:
 				vars.planet_health -= threat.hp
 				vars.threat_handler.threats.remove(threat)
-				print(vars.planet_health)
+				
 				break
 
 			for missile in vars.abil_handler.active_abils:
@@ -136,7 +156,20 @@ class Game:
 
 
 	def main_menu(self):
-		pass
+		in_menu = True
+		while in_menu:
+			self.screen.fill((0,0,0))
+			self.screen.blit(icon_img,(0,0))
+			self.inputs.keys()
+
+			if self.inputs.space_bar_click():
+				in_menu = False
+
+			self.inputs.update()
+			py.display.update()
+			self.clock.tick(self.framerate)
+
+
 
 
 	def end_screen(self):
@@ -158,14 +191,6 @@ class Game:
 		r = random.choice(a)
 		ast = Normal(r["pos"],r["hp"],r["dx"],r["dy"],r["img"])
 		Normal.HANDLER.add(ast)
-
-	class RoundVariables:
-		def __init__(self):
-			self.abil_handler = None
-			self.threat_handler = None
-			self.score = 0
-			self.frames = 0
-			self.planet_health = 100
 
 
 

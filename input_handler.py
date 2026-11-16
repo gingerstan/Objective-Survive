@@ -68,6 +68,9 @@ class InputHandler:
 	def right_click(self):
 		return not self.right_mouse and self.right_mouse_prev
 
+	def space_bar_click(self):
+		return not self.space and self.space_prev
+
 	def update(self):
 		self.left_mouse_prev = self.left_mouse
 		self.right_mouse_prev = self.right_mouse

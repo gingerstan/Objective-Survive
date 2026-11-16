@@ -49,6 +49,11 @@ class Animation:
 			#print(f"frame:{self.frame_num}, sub-frame:{self.sub_frame_num}")
 		else:
 			Animation.ALL_ANIMATIONS.remove(self)
+
+
+	def play_all():
+		for anim in Animation.ALL_ANIMATIONS:
+			anim.play()
 		
 
 

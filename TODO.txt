@@ -5,9 +5,9 @@ better GUI
 - Ammunition recharge bar
 - missile magazine state
 - planet health bar
-animation class
-- explosion animation 
+animations
 - missile engine animation
+- planet impact animation
 more abilities
 - tracking missile
 - planetary shield

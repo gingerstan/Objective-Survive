@@ -5,6 +5,9 @@ white = (255,255,255)
 bg_img = py.image.load("assets/battlefield.png")
 bg_img.set_colorkey(white)
 
+icon_img = py.image.load("assets/IconV1.png")
+icon_img.set_colorkey(white)
+
 bar_img = py.image.load("assets/upgrade_bar.png")
 bar_img.set_colorkey(white)
 
