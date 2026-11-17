@@ -6,23 +6,21 @@ class RapidFire:
 	COST = None
 	KEYS = None
 	HANDLER = None
+
+	TIMER = Timer(500)
 	
 	def __init__(self):
-		print("fire!")
-		RapidFire.HANDLER.append(self)
+		RapidFire.HANDLER.PA.append(self)
+		RapidFire.TIMER.active = True
 		Missile.TIMER = Timer(20)
-		self.timer = Timer(500)
-		self.timer.active = True
-
-
+		
 	def update(self):
-		if not self.timer.active:
-			print("sad")
-			Missile.TIMER = Timer(120)
-			RapidFire.HANDLER.remove(self)
+		if not RapidFire.TIMER.active:
+			Missile.TIMER = Timer(Missile.COOLDOWN)
+			RapidFire.HANDLER.PA.remove(self)
 
-	@EventBus.on("start_rapid_fire")
-	def start_rapid_fire():
+	@EventBus.on("rapid_fire")
+	def rapid_fire():
 		RapidFire()
 
 

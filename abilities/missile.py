@@ -1,5 +1,6 @@
 from abilities.ability_imports import *
 from load_assets import nuke_img
+from timer import Timer
 
 
 class Missile(Sprite):
@@ -7,10 +8,12 @@ class Missile(Sprite):
 	KEYS = None
 	HANDLER = None
 
-	TIMER = Timer(120)
+	COOLDOWN = 0
 	RADIUS = 0.5
 	SPEED = 1.8
 	DAMAGE = 8
+
+	TIMER = Timer(120)
 
 	def __init__(self, mouse_pos, pos=[500,700], img=nuke_img):
 		super().__init__()
@@ -38,13 +41,16 @@ class Missile(Sprite):
 
 		self.rect = img.get_rect()
 		self.rect.center = pos
+
 		self.blit_pos = [j,k]
+		# self.blit_pos = self.pos
 
 	def set_diff_modifiers(diff):
 		level = diff_configs[diff]
-		Missile.TIMER = Timer(level["missiles"]["cooldown"])
+		Missile.COOLDOWN = level["missiles"]["cooldown"]
 		Missile.RADIUS = level["missiles"]["radius"]
 		Missile.SPEED = level["missiles"]["speed"]
+		Missile.TIMER = Timer(Missile.COOLDOWN)
 
 	def on_hit(self,threat):
 		threat.hp -= Missile.DAMAGE
@@ -65,17 +71,19 @@ class Missile(Sprite):
 
 		j = self.pos[0] - rect_width
 		k = self.pos[1] - rect_height
+		self.blit_pos = [j,k]
+		# self.blit_pos = self.pos
 
 		self.rect = self.image.get_rect()
 		self.rect.center = self.pos
-		self.blit_pos = [j,k]
+		# self.rect.scale_by_ip(Missile.RADIUS)
+		
 
 
-	@EventBus.on("left_click")
+	@EventBus.on("launch_missile")
 	def launch_missile():
-		if not Missile.KEYS.shift and not Missile.TIMER.active and Missile.KEYS.mouse_pos[1] < 750:
-			Missile.TIMER.active = True
-			Missile.HANDLER.AA.add(Missile(Missile.KEYS.mouse_pos))
+		Missile.TIMER.active = True
+		Missile.HANDLER.AA.add(Missile(Missile.KEYS.mouse_pos))
 
 	@EventBus.on("upgrade_radius")
 	def upgrade_missile_radius():

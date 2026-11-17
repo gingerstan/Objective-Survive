@@ -2,10 +2,13 @@ import random
 import logging
 import pygame as py
 import math as m
+import time
 from functools import lru_cache
+from python_event_bus import EventBus
 from input_handler import InputHandler as IH
 from input_handler import GameStates
-from timer import *
+from timer import Timer
+from timer import EventTimer
 from animation import Animation
 from animation import load_image_sequence
 from animation import load_number_sequence
@@ -49,16 +52,13 @@ class Game:
 		
 		self.blitQueue = []
 		self.framerate = 120
-
-		self.fps = [] # for performance testing
-
 		self.inputs = IH()
 		self.vars = RoundVariables(1)
 
-		# TH.KEYS = self.inputs
-		AH.setup_abilities(self.inputs)
 		Button.KEYS = self.inputs
 		Animation.SCREEN = screen
+
+		self.fps = [] # for performance testing
 
 	def main_loop(self):
 		while True:
@@ -67,16 +67,16 @@ class Game:
 			self.end_screen() # reset game object, show score
 
 	def game_loop(self):
-		AH.set_all_diff_modifiers(self.inputs.diff)
-		AH.set_all_costs(1)
-
 		self.vars.reset(self.inputs.diff)
-		
+
+		AH.setup_abilities(self.inputs,self.vars.diff,1)
+
 		spawn_timer = EventTimer(180,"spawn_asteroid",TH.GROUP)
 		spawn_update_rate_timer = EventTimer(120,"update_spawn_rate",spawn_timer,self.vars)
 
 		self.inputs.state = GameStates.IN_GAME
 
+		prev_time = time.time()
 		debug_count = 0
 		in_game = True
 		while in_game:
@@ -84,6 +84,11 @@ class Game:
 			self.screen.blit(bg_img,(0,0))
 			self.inputs.keys()
 			self.check_game_buttons()
+
+			now = time.time()
+			self.vars.dt = now - prev_time
+			prev_time = now
+			self.vars.dt *= self.framerate
 
 
 			# pauses entities so player can use upgrade menu ##########################
@@ -96,8 +101,7 @@ class Game:
 				self.check_collisions(self.vars)
 
 				Timer.update_timers()
-				AH.AA.update() # could maybe merge AA and PA updates
-				AH.PA.update()
+				AH.update_all()
 				TH.GROUP.update()
 				self.vars.frames += 1
 
@@ -136,7 +140,8 @@ class Game:
 		self.screen.blit(bar_img,(0,800))
 		self.screen.blit(speed_upgrade_img,(50,830))
 		self.screen.blit(radius_upgrade_img,(50,900))
-		py.draw.rect(self.screen,(255,0,0),(850,900,self.vars.planet_health * self.vars.hp_gui_factor,75))
+		py.draw.rect(self.screen,(255,0,0),(850,900,self.vars.planet_health * self.vars.hp_gui_factor,60))
+		py.draw.rect(self.screen,(0,255,0),(850,820, (Missile.COOLDOWN - Missile.TIMER.time) * (100/Missile.COOLDOWN),60))
 
 		if self.inputs.mouse_pos[1] < 800:
 			py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
@@ -150,19 +155,17 @@ class Game:
 
 
 	def check_collisions(self, vars):
-
 		for threat in TH.GROUP:
 			if threat.pos[1] > 750:
 				threat.hit_planet(self.vars)
 
-		# for abil in vars.active_abils:
+		# for abil in AH.AA:
 		# 	py.draw.rect(self.screen,(255,255,255),abil.rect)
-		# 	pass
+			
 
 		hits = py.sprite.groupcollide(AH.AA, TH.GROUP, False, False)
 		if hits:
 			for abil,threat_array in hits.items():
-				abil.rect.scale_by_ip(Missile.RADIUS)
 				for threat in threat_array:
 					abil.on_hit(threat)
 					if threat.hp < 1:
@@ -182,6 +185,7 @@ class Game:
 				EventBus.call("upgrade_radius")
 		else:
 			pass
+
 
 	def main_menu(self):
 		self.inputs.state = GameStates.MENU
@@ -207,6 +211,11 @@ class Game:
 
 
 	def end_screen(self):
+		AH.AA.empty()
+		AH.PA.clear()
+		TH.GROUP.empty()
+		Timer.ALL_TIMERS.clear()
+
 		in_end = True
 		frames = 0
 		while in_end:
@@ -221,6 +230,8 @@ class Game:
 			frames += 1
 			py.display.update()
 			self.clock.tick(self.framerate)
+
+		self.inputs.state = GameStates.MENU
 
 
 	def display_score(self,score,end):
@@ -251,8 +262,10 @@ class Game:
 			self.screen.blit(img,pos)
 			digit += 1
 
+
 	@EventBus.on("update_difficulty")
 	def update_difficulty(inputs):
+		# print(inputs.diff)
 		if inputs.diff < 5:
 			inputs.diff += 1
 		elif inputs.diff == 5:

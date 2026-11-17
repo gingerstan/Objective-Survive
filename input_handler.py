@@ -45,6 +45,28 @@ class InputHandler:
 				if event.key == py.K_LSHIFT:
 					self.shift = False
 
+			# if event.type == py.KEYDOWN:
+			# 	if event.key == py.K_w:
+			# 		keys[0] = True
+			# 	if event.key == py.K_a:
+			# 		keys[1] = True
+			# 	if event.key == py.K_s:
+			# 		keys[2] = True
+			# 	if event.key == py.K_d:
+			# 		keys[3] = True
+
+		
+			# if event.type == py.KEYUP:
+			# 	if event.key == py.K_w:
+			# 		keys[0] = False
+			# 	if event.key == py.K_a:
+			# 		keys[1] = False
+			# 	if event.key == py.K_s:
+			# 		keys[2] = False
+			# 	if event.key == py.K_d:
+			# 		keys[3] = False
+
+
 			if event.type == py.MOUSEBUTTONDOWN:
 				if py.mouse.get_pressed()[0]:
 					self.left_mouse = True
