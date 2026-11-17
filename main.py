@@ -3,7 +3,7 @@ import logging
 import pygame as py
 import math as m
 from functools import lru_cache
-from input_handler import InputHandler
+from input_handler import InputHandler as IH
 from input_handler import GameStates
 from timer import *
 from animation import Animation
@@ -12,8 +12,8 @@ from animation import load_number_sequence
 from round_variables import RoundVariables
 from game_configs.difficulty_configs import *
 from gui import Button
-from abilities.ability_handler import AbilityHandler
-from threats.threat_handler import ThreatHandler
+from abilities.ability_handler import AbilityHandler as AH
+from threats.threat_handler import ThreatHandler as TH
 from abilities.missile import Missile
 from abilities.rapid_fire import RapidFire
 from threats.asteroid import Normal
@@ -29,10 +29,6 @@ from load_assets import rubble_img
 from load_assets import metal_img
 from load_assets import icon_img
 from load_assets import loser_img
-
-
-
-ALL_THREATS = [Normal]
 
 
 logging.basicConfig(
@@ -56,11 +52,11 @@ class Game:
 
 		self.fps = [] # for performance testing
 
-		self.inputs = InputHandler()
-		self.ability_handler = AbilityHandler(self.inputs)
-		self.threat_handler = ThreatHandler(self.inputs)
+		self.inputs = IH()
 		self.vars = RoundVariables(1)
 
+		# TH.KEYS = self.inputs
+		AH.setup_abilities(self.inputs)
 		Button.KEYS = self.inputs
 		Animation.SCREEN = screen
 
@@ -71,12 +67,12 @@ class Game:
 			self.end_screen() # reset game object, show score
 
 	def game_loop(self):
-		AbilityHandler.set_all_diff_modifiers(self.inputs.diff)
-		AbilityHandler.set_all_cost_modifiers()
+		AH.set_all_diff_modifiers(self.inputs.diff)
+		AH.set_all_costs(1)
 
 		self.vars.reset(self.inputs.diff)
 		
-		spawn_timer = EventTimer(180,"spawn_asteroid",self.threat_handler.group)
+		spawn_timer = EventTimer(180,"spawn_asteroid",TH.GROUP)
 		spawn_update_rate_timer = EventTimer(120,"update_spawn_rate",spawn_timer,self.vars)
 
 		self.inputs.state = GameStates.IN_GAME
@@ -97,11 +93,12 @@ class Game:
 				# else:
 				# 	debug_count = 0
 					
-				self.check_collisions(vars)
+				self.check_collisions(self.vars)
 
 				Timer.update_timers()
-				self.ability_handler.active_abils.update()
-				self.threat_handler.group.update()
+				AH.AA.update() # could maybe merge AA and PA updates
+				AH.PA.update()
+				TH.GROUP.update()
 				self.vars.frames += 1
 
 				if self.vars.planet_health < 1:
@@ -123,8 +120,8 @@ class Game:
 			self.draw_game_gui(vars)
 			Animation.play_all(self.blitQueue)
 			
-			self.ability_handler.active_abils.draw(self.screen)
-			self.threat_handler.group.draw(self.screen)
+			AH.AA.draw(self.screen)
+			TH.GROUP.draw(self.screen)
 			self.screen.blits(self.blitQueue)
 
 			self.inputs.update()
@@ -154,7 +151,7 @@ class Game:
 
 	def check_collisions(self, vars):
 
-		for threat in self.threat_handler.group:
+		for threat in TH.GROUP:
 			if threat.pos[1] > 750:
 				threat.hit_planet(self.vars)
 
@@ -162,7 +159,7 @@ class Game:
 		# 	py.draw.rect(self.screen,(255,255,255),abil.rect)
 		# 	pass
 
-		hits = py.sprite.groupcollide(self.ability_handler.active_abils, self.threat_handler.group, False, False)
+		hits = py.sprite.groupcollide(AH.AA, TH.GROUP, False, False)
 		if hits:
 			for abil,threat_array in hits.items():
 				abil.rect.scale_by_ip(Missile.RADIUS)

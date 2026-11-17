@@ -1,4 +1,3 @@
-from abilities.ability_imports import *
 from abilities.missile import Missile
 from abilities.rapid_fire import RapidFire
 
@@ -6,35 +5,31 @@ from pygame.sprite import Group
 
 
 class AbilityHandler:
+	KEYS = None
+	SCREEN = None
+
 	ALL_ABIL_NAMES = [Missile,RapidFire]
 	ACTIVE_ABIL_NAMES = [Missile]
 	PASSIVE_ABILS_NAMES = [RapidFire]
 
-	KEYS = None
-	SCREEN = None
+	AA = Group() # all current Active Abilities
+	PA = Group() # all current Passive Abilities
+		
+	def check_inputs():
+		keys = AbilityHandler.KEYS
+		
 
-	def __init__(self,keys):
+	
+
+	def setup_abilities(keys):
 		AbilityHandler.KEYS = keys
-		for ABIL in AbilityHandler.ALL_ABIL_NAMES: # ALL_ABILS defined in ability_handler.py
+		for ABIL in AbilityHandler.ALL_ABIL_NAMES: 
 			ABIL.KEYS = AbilityHandler.KEYS
-			ABIL.HANDLER = self
-
-		self.active_abils = Group()
-
-
-	def check_inputs(self):
-		pass
-
-		# this function triggers the activation of abilities if
-		# correct conditions are met
-
-	@EventBus.on("right_click")
-	def right_click_abils(self,inputs):
-		pass
+			ABIL.HANDLER = AbilityHandler
 
 	def set_all_diff_modifiers(diff):
 		Missile.set_diff_modifiers(diff)
 
-	def set_all_cost_modifiers():
-		Missile.COST = 0
-		RapidFire.COST = 100
+	def set_all_costs(modifier):
+		Missile.COST = 0 * modifier
+		RapidFire.COST = 100 * modifier

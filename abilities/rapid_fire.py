@@ -5,6 +5,7 @@ from timer import EventTimer
 class RapidFire:
 	COST = None
 	KEYS = None
+	HANDLER = None
 	
 	def __init__(self):
 		print("fire!")

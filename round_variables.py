@@ -1,5 +1,6 @@
 from game_configs.difficulty_configs import diff_configs
 from pygame.sprite import Group
+from timer import EventTimer
 
 
 class RoundVariables:
@@ -20,3 +21,6 @@ class RoundVariables:
 
 		self.ast_spawn_slope = diff_configs[diff]["threats"]["asteroid_spawn_rate_slope"]
 		self.ast_spawn_mod = diff_configs[diff]["threats"]["asteroid_spawn_rate_mod"]
+
+	
+

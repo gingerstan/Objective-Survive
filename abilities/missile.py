@@ -3,14 +3,14 @@ from load_assets import nuke_img
 
 
 class Missile(Sprite):
+	COST = None
+	KEYS = None
+	HANDLER = None
+
 	TIMER = Timer(120)
 	RADIUS = 0.5
 	SPEED = 1.8
 	DAMAGE = 8
-
-	KEYS = None
-	COST = 0
-	HANDLER = None
 
 	def __init__(self, mouse_pos, pos=[500,700], img=nuke_img):
 		super().__init__()
@@ -75,7 +75,7 @@ class Missile(Sprite):
 	def launch_missile():
 		if not Missile.KEYS.shift and not Missile.TIMER.active and Missile.KEYS.mouse_pos[1] < 750:
 			Missile.TIMER.active = True
-			Missile.HANDLER.active_abils.add(Missile(Missile.KEYS.mouse_pos))
+			Missile.HANDLER.AA.add(Missile(Missile.KEYS.mouse_pos))
 
 	@EventBus.on("upgrade_radius")
 	def upgrade_missile_radius():

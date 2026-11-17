@@ -1,6 +1,4 @@
-# import pygame as py, sys
 from pygame.sprite import Sprite
-
 
 class Normal(Sprite):
 	def __init__(self, pos, hp, dx, dy, img):
@@ -45,8 +43,5 @@ class Normal(Sprite):
 		self.kill()
 
 
-
-
-ALL_THREATS = [Normal]
 
 

@@ -1,9 +1,9 @@
 from pygame.sprite import Group
+from threats.asteroid import Normal
 
 class ThreatHandler:
-	KEYS = None
-	SCREEN = None
+	# KEYS = None
+	# SCREEN = None
 
-	def __init__(self,keys):
-		ThreatHandler.KEYS = keys
-		self.group = Group()
+	ALL_THREATS = [Normal]
+	GROUP = Group()
