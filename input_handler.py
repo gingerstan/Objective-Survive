@@ -10,7 +10,7 @@ class GameStates(Enum):
 class InputHandler:
 	def __init__(self):
 		self.state = GameStates.MENU
-		self.difficulty = 1
+		self.diff = 1
 
 		self.left_mouse = False
 		self.left_mouse_prev = False
@@ -61,12 +61,15 @@ class InputHandler:
 
 		if not self.left_mouse and self.left_mouse_prev:
 			if self.state == GameStates.IN_GAME:
-				EventBus.call("left_click",self)
+				EventBus.call("left_click")
 			if self.state == GameStates.MENU:
 				EventBus.call("left_click_menu")
 
 		if not self.right_mouse and self.right_mouse_prev:
-			EventBus.call("right_click",self)
+			if self.state == GameStates.IN_GAME:
+				EventBus.call("right_click")
+			if self.state == GameStates.MENU:
+				EventBus.call("right_click_menu")
 
 		if not self.space and self.space_prev:
 			EventBus.call("space_click")

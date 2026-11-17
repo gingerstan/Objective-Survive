@@ -3,6 +3,7 @@ white = (255,255,255)
 
 class Animation:
 	ALL_ANIMATIONS = []
+	SCREEN = None
 
 	def __init__(self, seq_prefix, screen, pos, colorkey=(255,255,255), scale=1):
 		Animation.ALL_ANIMATIONS.append(self)
@@ -61,6 +62,7 @@ def load_number_sequence():
 	for i in range(10):
 		frame = py.image.load(f"assets/{i}.png")
 		frame.set_colorkey(white)
+		frame.convert()
 		frame_array.append(frame)
 
 	return frame_array

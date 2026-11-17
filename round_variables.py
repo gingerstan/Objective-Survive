@@ -1,6 +1,5 @@
 from game_configs.difficulty_configs import diff_configs
-from asteroid import ThreatHandler
-from ability_handler import AbilityHandler
+from pygame.sprite import Group
 
 
 class RoundVariables:
@@ -11,13 +10,13 @@ class RoundVariables:
 		pass
 
 	def reset(self,diff):
-		self.abil_handler = AbilityHandler()
-		self.threat_handler = ThreatHandler()
 		self.score = 0
 		self.frames = 0
+		self.points = 0
+		self.diff = diff
+		
 		self.planet_health = diff_configs[diff]["planet"]["planet_health"]
 		self.hp_gui_factor = 100 / self.planet_health
 
-		self.difficulty = diff
 		self.ast_spawn_slope = diff_configs[diff]["threats"]["asteroid_spawn_rate_slope"]
 		self.ast_spawn_mod = diff_configs[diff]["threats"]["asteroid_spawn_rate_mod"]

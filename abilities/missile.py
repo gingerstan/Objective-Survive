@@ -1,17 +1,21 @@
 from abilities.ability_imports import *
 from load_assets import nuke_img
-from game_configs.difficulty_configs import diff_configs
 
-class Missile(py.sprite.Sprite):
+
+class Missile(Sprite):
 	TIMER = Timer(120)
 	RADIUS = 0.5
 	SPEED = 1.8
-	
+	DAMAGE = 8
+
+	KEYS = None
+	COST = 0
+	HANDLER = None
+
 	def __init__(self, mouse_pos, pos=[500,700], img=nuke_img):
-		py.sprite.Sprite.__init__(self)
+		super().__init__()
 
 		self.pos = pos.copy()
-		self.img = img
 
 		x = mouse_pos[0]
 		y = mouse_pos[1]
@@ -24,7 +28,7 @@ class Missile(py.sprite.Sprite):
 		self.dx = dx / hyp
 
 		self.angle = m.degrees(m.atan2(dy,dx)) - 90 # in degrees
-		self.img = py.transform.rotate(self.img, self.angle)
+		self.image = py.transform.rotate(img, self.angle)
 
 		rect_width = int(img.get_width()) / 2
 		rect_height = int(img.get_height()) / 2
@@ -42,32 +46,36 @@ class Missile(py.sprite.Sprite):
 		Missile.RADIUS = level["missiles"]["radius"]
 		Missile.SPEED = level["missiles"]["speed"]
 
+	def on_hit(self,threat):
+		threat.hp -= Missile.DAMAGE
+		Animation("death", Animation.SCREEN, self.pos, scale=Missile.RADIUS)
+		self.kill()
+
 	def update(self):
 		if self.pos[0] > 1100 or self.pos[0] < -100:
-			return False
+			self.kill()
 		if self.pos[1] > 720 or self.pos[1] < -100:
-			return False
+			self.kill()
 
 		self.pos[0] += self.dx * Missile.SPEED
 		self.pos[1] -= self.dy * Missile.SPEED
 
-		rect_width = int(self.img.get_width()) / 2
-		rect_height = int(self.img.get_height()) / 2
+		rect_width = int(self.image.get_width()) / 2
+		rect_height = int(self.image.get_height()) / 2
 
 		j = self.pos[0] - rect_width
 		k = self.pos[1] - rect_height
 
-		self.rect = self.img.get_rect()
+		self.rect = self.image.get_rect()
 		self.rect.center = self.pos
 		self.blit_pos = [j,k]
 
-		return True
 
 	@EventBus.on("left_click")
-	def launch_missile(inputs):
-		if not inputs.shift and not Missile.TIMER.active and inputs.mouse_pos[1] < 750:
+	def launch_missile():
+		if not Missile.KEYS.shift and not Missile.TIMER.active and Missile.KEYS.mouse_pos[1] < 750:
 			Missile.TIMER.active = True
-			Missile.HANDLER.add(Missile(Missile.KEYS.mouse_pos))
+			Missile.HANDLER.active_abils.add(Missile(Missile.KEYS.mouse_pos))
 
 	@EventBus.on("upgrade_radius")
 	def upgrade_missile_radius():

@@ -9,13 +9,12 @@ class Button:
 	ALL_BUTTONS = []
 	KEYS = None  # assigned in Game.__init__
 
-	def __init__(self, pos, name, img,width=75,height=75):
+	def __init__(self, pos, name, img, width=75,height=75):
 		Button.ALL_BUTTONS.append(self)
 		self.pos = pos.copy()
 		self.name = name
 		self.img = img
 		self.rect = py.Rect(pos[0],pos[1],width,height)
-
 
 	def draw(screen):
 		for button in Button.ALL_BUTTONS:

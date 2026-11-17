@@ -13,7 +13,7 @@ diff_configs = {
 				"planet_health" : 150
 			},
 			"threats" : {
-				"asteroid_spawn_rate_slope" : -0.002,
+				"asteroid_spawn_rate_slope" : -0.004,
 				"asteroid_spawn_rate_mod" : 200 
 			},
 			"missiles" : {
@@ -28,7 +28,7 @@ diff_configs = {
 				"planet_health" : 125
 			},
 			"threats" : {
-				"asteroid_spawn_rate_slope" : -0.002,
+				"asteroid_spawn_rate_slope" : -0.005,
 				"asteroid_spawn_rate_mod" : 190 
 			},
 			"missiles" : {
@@ -43,7 +43,7 @@ diff_configs = {
 				"planet_health" : 100
 			},
 			"threats" : {
-				"asteroid_spawn_rate_slope" : -0.003,
+				"asteroid_spawn_rate_slope" : -0.006,
 				"asteroid_spawn_rate_mod" : 180
 			},
 			"missiles" : {
@@ -58,7 +58,7 @@ diff_configs = {
 				"planet_health" : 50
 			},
 			"threats" : {
-				"asteroid_spawn_rate_slope" : -0.004,
+				"asteroid_spawn_rate_slope" : -0.008,
 				"asteroid_spawn_rate_mod" : 180
 			},
 			"missiles" : {
@@ -73,11 +73,11 @@ diff_configs = {
 				"planet_health" : 10
 			},
 			"threats" : {
-				"asteroid_spawn_rate_slope" : -0.0045,
+				"asteroid_spawn_rate_slope" : -0.01,
 				"asteroid_spawn_rate_mod" : 170 
 			},
 			"missiles" : {
-				"speed" : 1.2,
+				"speed" : 1.4,
 				"radius" : 0.3,
 				"cooldown" : 150
 			}
