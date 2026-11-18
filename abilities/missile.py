@@ -54,7 +54,7 @@ class Missile(Sprite):
 
 	def on_hit(self,threat):
 		threat.hp -= Missile.DAMAGE
-		Animation("death", Animation.SCREEN, self.pos, scale=Missile.RADIUS)
+		Animation("death", self.pos, scale=Missile.RADIUS)
 		self.kill()
 
 	def update(self):

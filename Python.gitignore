@@ -1,4 +1,7 @@
 *.log
+abilities/__pycache__
+threats/__pycache__
+game_configs/__pycache__
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

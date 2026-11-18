@@ -11,7 +11,6 @@ class Animation:
 
 		self.num_of_frames = seq["num_of_frames"]
 		self.frame_time = seq["frame_time"] # how many game frames one frame of the animation lasts for
-		self.screen = screen
 		self.frames = seq["frames"].copy()
 		self.angle = angle
 		self.loop = loop
@@ -57,7 +56,7 @@ class Animation:
 			anim.play(blitQueue)
 
 	def remove_anim(anim):
-		Animations.ALL_ANIMATIONS.remove(anim)
+		Animation.ALL_ANIMATIONS.remove(anim)
 
 
 
