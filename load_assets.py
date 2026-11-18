@@ -46,6 +46,10 @@ metal_img = py.image.load("assets/Metal.png")
 metal_img.set_colorkey(white)
 metal_img.convert()
 
+comet_img = py.image.load("assets/comet.png")
+comet_img.set_colorkey(white)
+comet_img.convert()
+
 diff_img = py.image.load("assets/diff.png")
 diff_img.set_colorkey(white)
 diff_img.convert()

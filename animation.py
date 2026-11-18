@@ -5,7 +5,7 @@ class Animation:
 	ALL_ANIMATIONS = []
 	SCREEN = None
 
-	def __init__(self, seq_prefix, pos, colorkey=(255,255,255), scale=1, angle=90, loop=False):
+	def __init__(self, seq_prefix, pos, colorkey=(255,255,255), scale=1, angle=0, loop=False):
 		Animation.ALL_ANIMATIONS.append(self)
 		seq = Animation.SEQUENCES[seq_prefix]
 
@@ -19,7 +19,7 @@ class Animation:
 			for i in range(self.num_of_frames):
 				self.frames[i] = py.transform.scale_by(self.frames[i],scale)
 
-		if angle != 90:
+		if angle != 0:
 			for i in range(self.num_of_frames):
 				self.frames[i] = py.transform.rotate(self.frames[i],self.angle)
 

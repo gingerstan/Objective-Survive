@@ -31,6 +31,7 @@ from load_assets import radius_upgrade_img
 from load_assets import normal_img
 from load_assets import rubble_img
 from load_assets import metal_img
+from load_assets import comet_img
 from load_assets import icon_img
 from load_assets import loser_img
 
@@ -269,7 +270,6 @@ class Game:
 
 	@EventBus.on("update_difficulty")
 	def update_difficulty(inputs):
-		# print(inputs.diff)
 		if inputs.diff < 5:
 			inputs.diff += 1
 		elif inputs.diff == 5:
@@ -280,18 +280,18 @@ class Game:
 	def spawn_asteroids(threat_group):
 		# add new functions later to have different / random spawn configurations
 		a = [
-			# {"type":"asteroid","pos" : [500,50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : normal_img },
-			# {"type":"asteroid","pos" : [100,50],"hp" : 12,"dx" : 0.3,"dy" : 0.7,"img" : metal_img },
-			# {"type":"asteroid","pos" : [900,50],"hp" : 3,"dx" : -0.5,"dy" : 1.1,"img" : rubble_img },
-			# {"type":"asteroid","pos" : [300,50],"hp" : 6,"dx" : 0.1,"dy" : 1.6,"img" : normal_img },
-			# {"type":"asteroid","pos" : [700,50],"hp" : 3,"dx" : -0.3,"dy" : 0.9,"img" : rubble_img },
-			# {"type":"asteroid","pos" : [500,50],"hp" : 2,"dx" : 0.3,"dy" : 1.8,"img" : rubble_img },
-			# {"type":"asteroid","pos" : [400,50],"hp" : 11,"dx" : -0.15,"dy" : 0.5,"img" : metal_img },
-			# {"type":"asteroid","pos" : [200,50],"hp" : 15,"dx" : -0.1,"dy" : 0.6,"img" : metal_img },
-			{"type":"asteroid","pos" : [800,50],"hp" : 7,"dx" : 0.1,"dy" : 1,"img" : normal_img },
-			{"type":"asteroid","pos" : [250,50],"hp" : 9,"dx" : 0.15,"dy" : 1.2,"img" : normal_img },
-			{"type":"comet","pos":[250,50],"path_pos":[250,50],"dx":0.15,"dy":1.2,"angle":75,"hp":20,"img" : normal_img },
-			{"type":"comet","pos":[500,50],"path_pos":[500,50],"dx":0.05,"dy":1.3,"angle":90,"hp":20,"img" : normal_img }
+			{"type":"asteroid","pos" : [500,-50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : normal_img },
+			{"type":"asteroid","pos" : [100,-50],"hp" : 12,"dx" : 0.3,"dy" : 0.7,"img" : metal_img },
+			{"type":"asteroid","pos" : [900,-50],"hp" : 3,"dx" : -0.5,"dy" : 1.1,"img" : rubble_img },
+			{"type":"asteroid","pos" : [300,-50],"hp" : 6,"dx" : 0.1,"dy" : 1.6,"img" : normal_img },
+			{"type":"asteroid","pos" : [700,-50],"hp" : 3,"dx" : -0.3,"dy" : 0.9,"img" : rubble_img },
+			{"type":"asteroid","pos" : [500,-50],"hp" : 2,"dx" : 0.3,"dy" : 1.8,"img" : rubble_img },
+			{"type":"asteroid","pos" : [400,-50],"hp" : 11,"dx" : -0.15,"dy" : 0.5,"img" : metal_img },
+			{"type":"asteroid","pos" : [200,-50],"hp" : 15,"dx" : -0.1,"dy" : 0.6,"img" : metal_img },
+			{"type":"asteroid","pos" : [800,-50],"hp" : 7,"dx" : 0.1,"dy" : 1,"img" : normal_img },
+			{"type":"asteroid","pos" : [250,-50],"hp" : 9,"dx" : 0.15,"dy" : 1.2,"img" : normal_img },
+			{"type":"comet","pos":[60,-199],"path_pos":[150,200],"dx":0.22,"dy":0.8,"angle":105,"hp":25,"img" : comet_img },
+			{"type":"comet","pos":[500,-199],"path_pos":[500,150],"dx":0.05,"dy":1.2,"angle":90,"hp":20,"img" : comet_img }
 		]
 
 		r = random.choice(a)
