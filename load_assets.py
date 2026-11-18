@@ -5,6 +5,10 @@ screen = py.display.set_mode((1000,1000), 0, 32)
 
 white = (255,255,255)
 
+cursor_img = py.image.load("assets/cursor.png")
+cursor_img.set_colorkey(white)
+cursor_img.convert()
+
 bg_img = py.image.load("assets/battlefield.png")
 bg_img.set_colorkey(white)
 bg_img.convert()

@@ -24,6 +24,7 @@ from threats.comet import Comet
 
 
 from load_assets import screen
+from load_assets import cursor_img
 from load_assets import bg_img
 from load_assets import bar_img
 from load_assets import speed_upgrade_img
@@ -44,6 +45,10 @@ logging.basicConfig(
     encoding="utf-8",
 )
 logger = logging.getLogger(__name__)
+
+cursor_img = py.transform.scale(cursor_img,(60,60))
+cursor = py.cursors.Cursor((30,30),cursor_img)
+py.mouse.set_cursor(cursor)
 
 
 class Game:
@@ -145,8 +150,8 @@ class Game:
 		py.draw.rect(self.screen,(255,0,0),(850,900,self.vars.planet_health * self.vars.hp_gui_factor,60))
 		py.draw.rect(self.screen,(0,255,0),(850,820, (Missile.COOLDOWN - Missile.TIMER.time) * (100/Missile.COOLDOWN),60))
 
-		if self.inputs.mouse_pos[1] < 800:
-			py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
+		# if self.inputs.mouse_pos[1] < 800:
+		# 	py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
 
 		self.display_score(self.vars.score,False)
 
@@ -160,6 +165,7 @@ class Game:
 		for threat in TH.GROUP:
 			if threat.pos[1] > 750:
 				threat.hit_planet(self.vars)
+				pass
 
 		# for abil in AH.AA:
 		# 	py.draw.rect(self.screen,(255,255,255),abil.rect)
@@ -280,6 +286,7 @@ class Game:
 	def spawn_asteroids(threat_group):
 		# add new functions later to have different / random spawn configurations
 		a = [
+			# {"type":"asteroid","pos" : [500,-50],"hp" : 1,"dx" : 0.01,"dy" : 0.01,"img" : rubble_img }
 			{"type":"asteroid","pos" : [500,-50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : normal_img },
 			{"type":"asteroid","pos" : [100,-50],"hp" : 12,"dx" : 0.3,"dy" : 0.7,"img" : metal_img },
 			{"type":"asteroid","pos" : [900,-50],"hp" : 3,"dx" : -0.5,"dy" : 1.1,"img" : rubble_img },
