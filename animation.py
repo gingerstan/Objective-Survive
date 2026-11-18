@@ -5,7 +5,7 @@ class Animation:
 	ALL_ANIMATIONS = []
 	SCREEN = None
 
-	def __init__(self, seq_prefix, screen, pos, colorkey=(255,255,255), scale=1):
+	def __init__(self, seq_prefix, pos, colorkey=(255,255,255), scale=1, angle=90, loop=False):
 		Animation.ALL_ANIMATIONS.append(self)
 		seq = Animation.SEQUENCES[seq_prefix]
 
@@ -13,10 +13,16 @@ class Animation:
 		self.frame_time = seq["frame_time"] # how many game frames one frame of the animation lasts for
 		self.screen = screen
 		self.frames = seq["frames"].copy()
+		self.angle = angle
+		self.loop = loop
 
 		if scale != 1:
 			for i in range(self.num_of_frames):
 				self.frames[i] = py.transform.scale_by(self.frames[i],scale)
+
+		if angle != 90:
+			for i in range(self.num_of_frames):
+				self.frames[i] = py.transform.rotate(self.frames[i],self.angle)
 
 		self.frame_num = 0
 		self.sub_frame_num = 0
@@ -39,12 +45,19 @@ class Animation:
 				self.sub_frame_num = 0
 				self.frame_num += 1
 		else:
-			Animation.ALL_ANIMATIONS.remove(self)
+			if self.loop:
+				self.frame_num = 0
+				self.sub_frame_num = 0
+			else:
+				Animation.ALL_ANIMATIONS.remove(self)
 
 
 	def play_all(blitQueue):
 		for anim in Animation.ALL_ANIMATIONS:
 			anim.play(blitQueue)
+
+	def remove_anim(anim):
+		Animations.ALL_ANIMATIONS.remove(anim)
 
 
 
@@ -69,7 +82,7 @@ def load_number_sequence():
 
 def load_all_sequences(sequences):
 	for name,array in sequences.items():
-		sequences[name]["frames"] = load_image_sequence("death",sequences[name]["num_of_frames"])
+		sequences[name]["frames"] = load_image_sequence(name,sequences[name]["num_of_frames"])
 
 	return sequences
 
@@ -79,6 +92,12 @@ sequences = {
 		"frames" : [],
 		"num_of_frames" : 11,
 		"frame_time" : 7
-	}
+	},
+	"cometPath" : {
+		"frames" : [],
+		"num_of_frames" : 7,
+		"frame_time" : 9
+	},
+
 }
 Animation.SEQUENCES = load_all_sequences(sequences)

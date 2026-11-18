@@ -169,6 +169,8 @@ class Game:
 				for threat in threat_array:
 					abil.on_hit(threat)
 					if threat.hp < 1:
+						if hasattr(threat,"anim"):
+							Animation.remove_anim(threat.anim)
 						self.vars.score += threat.maxHP
 						threat.kill()
 						break
@@ -276,21 +278,26 @@ class Game:
 	def spawn_asteroids(threat_group):
 		# add new functions later to have different / random spawn configurations
 		a = [
-			{"pos" : [500,50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : normal_img },
-			{"pos" : [100,50],"hp" : 12,"dx" : 0.3,"dy" : 0.7,"img" : metal_img },
-			{"pos" : [900,50],"hp" : 3,"dx" : -0.5,"dy" : 1.1,"img" : rubble_img },
-			{"pos" : [300,50],"hp" : 6,"dx" : 0.1,"dy" : 1.6,"img" : normal_img },
-			{"pos" : [700,50],"hp" : 3,"dx" : -0.3,"dy" : 0.9,"img" : rubble_img },
-			{"pos" : [500,50],"hp" : 2,"dx" : 0.3,"dy" : 1.8,"img" : rubble_img },
-			{"pos" : [400,50],"hp" : 11,"dx" : -0.15,"dy" : 0.5,"img" : metal_img },
-			{"pos" : [200,50],"hp" : 15,"dx" : -0.1,"dy" : 0.6,"img" : metal_img },
-			{"pos" : [800,50],"hp" : 7,"dx" : 0.1,"dy" : 1,"img" : normal_img },
-			{"pos" : [250,50],"hp" : 9,"dx" : 0.15,"dy" : 1.2,"img" : normal_img }
+			{"type":"asteroid","pos" : [500,50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : normal_img },
+			{"type":"asteroid","pos" : [100,50],"hp" : 12,"dx" : 0.3,"dy" : 0.7,"img" : metal_img },
+			{"type":"asteroid","pos" : [900,50],"hp" : 3,"dx" : -0.5,"dy" : 1.1,"img" : rubble_img },
+			{"type":"asteroid","pos" : [300,50],"hp" : 6,"dx" : 0.1,"dy" : 1.6,"img" : normal_img },
+			{"type":"asteroid","pos" : [700,50],"hp" : 3,"dx" : -0.3,"dy" : 0.9,"img" : rubble_img },
+			{"type":"asteroid","pos" : [500,50],"hp" : 2,"dx" : 0.3,"dy" : 1.8,"img" : rubble_img },
+			{"type":"asteroid","pos" : [400,50],"hp" : 11,"dx" : -0.15,"dy" : 0.5,"img" : metal_img },
+			{"type":"asteroid","pos" : [200,50],"hp" : 15,"dx" : -0.1,"dy" : 0.6,"img" : metal_img },
+			{"type":"asteroid","pos" : [800,50],"hp" : 7,"dx" : 0.1,"dy" : 1,"img" : normal_img },
+			{"type":"asteroid","pos" : [250,50],"hp" : 9,"dx" : 0.15,"dy" : 1.2,"img" : normal_img },
+			{"type":"comet","pos":[250,50],"dx":0.15,"dy":1.2,"angle":75,"hp":20,"img" : normal_img }
 		]
 
 		r = random.choice(a)
-		ast = Normal(r["pos"],r["hp"],r["dx"],r["dy"],r["img"])
-		threat_group[0].add(ast)
+		if r["type"] == "asteroid":
+			threat = Normal(r["pos"],r["hp"],r["dx"],r["dy"],r["img"])
+		elif r["type"] == "comet":
+			threat = Comet(r["pos"],r["dx"],r["dy"],r["angle"],r["hp"],r["img"])
+		
+		threat_group[0].add(threat)
 
 	
 
