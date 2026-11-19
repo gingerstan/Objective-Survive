@@ -6,10 +6,10 @@ import time
 from functools import lru_cache
 from python_event_bus import EventBus
 from input_handler import InputHandler as IH
-from input_handler import GameStates
 from timer import Timer
 from timer import EventTimer
 from animation import Animation
+from game_states import GameStates
 from animation import load_image_sequence
 from animation import load_number_sequence
 from round_variables import RoundVariables
@@ -38,11 +38,11 @@ from load_assets import loser_img
 
 
 logging.basicConfig(
-    level=logging.DEBUG,
-    format="%(asctime)s - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M",
-    filename="scores.log",  # Omit to print to the console instead
-    encoding="utf-8",
+	level=logging.DEBUG,
+	format="%(asctime)s - %(levelname)s - %(message)s",
+	datefmt="%Y-%m-%d %H:%M",
+	filename="scores.log",  # Omit to print to the console instead
+	encoding="utf-8",
 )
 logger = logging.getLogger(__name__)
 
@@ -52,18 +52,28 @@ py.mouse.set_cursor(cursor)
 
 
 class Game:
+	g = None
+	state = GameStates.START_MENU
+
+	def __new__(cls):
+		if cls.g is None:
+			cls.g = super().__new__(cls)
+		return cls.g
+
 	def __init__(self):
 		# pygame and screen initialized in load_assets
 		self.clock = py.time.Clock()
 		self.screen = screen
-		
-		self.blitQueue = []
 		self.framerate = 120
+		self.blitQueue = []
+		
 		self.inputs = IH()
+		self.inputs.state = Game.state
+
+		AH.setup_abilities(self.inputs)
 		self.vars = RoundVariables(1)
 
 		Button.KEYS = self.inputs
-		Animation.SCREEN = screen
 
 		self.fps = [] # for performance testing
 
@@ -74,14 +84,16 @@ class Game:
 			self.end_screen() # reset game object, show score
 
 	def game_loop(self):
+		self.inputs.update()
 		self.vars.reset(self.inputs.diff)
 
-		AH.setup_abilities(self.inputs,self.vars.diff,1)
+		AH.STATE = GameStates.IN_GAME
+		AH.set_diff_modifiers(self.vars.diff,1)
 
-		spawn_timer = EventTimer(180,"spawn_asteroid",TH.GROUP)
-		spawn_update_rate_timer = EventTimer(120,"update_spawn_rate",spawn_timer,self.vars)
+		spawn_timer = EventTimer(180,"spawn_asteroid")
+		spawn_update_rate_timer = EventTimer(120,"update_spawn_rate",spawn_timer)
 
-		self.inputs.state = GameStates.IN_GAME
+		g.state = GameStates.IN_GAME
 
 		prev_time = time.time()
 		debug_count = 0
@@ -158,7 +170,7 @@ class Game:
 
 	@EventBus.on("update_spawn_rate")
 	def update_spawn_rate(args):
-		args[0].period = (args[1].ast_spawn_slope*args[1].frames) + args[1].ast_spawn_mod
+		args[0].period = (g.vars.ast_spawn_slope*g.vars.frames) + g.vars.ast_spawn_mod
 
 
 	def check_collisions(self, vars):
@@ -198,7 +210,8 @@ class Game:
 
 
 	def main_menu(self):
-		self.inputs.state = GameStates.MENU
+		AH.STATE = GameStates.START_MENU
+		g.state = GameStates.START_MENU
 		nums = load_number_sequence()
 
 		in_menu = True
@@ -242,7 +255,7 @@ class Game:
 			py.display.update()
 			self.clock.tick(self.framerate)
 
-		self.inputs.state = GameStates.MENU
+		g.state = GameStates.MENU
 
 
 	def display_score(self,score,end):
@@ -283,7 +296,7 @@ class Game:
 
 
 	@EventBus.on("spawn_asteroid")
-	def spawn_asteroids(threat_group):
+	def spawn_asteroids():
 		# add new functions later to have different / random spawn configurations
 		a = [
 			# {"type":"asteroid","pos" : [500,-50],"hp" : 0,"dx" : 0,"dy" : 0,"img" : rubble_img }
@@ -307,10 +320,9 @@ class Game:
 		elif r["type"] == "comet":
 			threat = Comet(r["pos"],r["path_pos"],r["dx"],r["dy"],r["angle"],r["hp"],r["img"])
 		
-		threat_group[0].add(threat)
+		TH.GROUP.add(threat)
 
 	
-
 
 
 

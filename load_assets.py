@@ -9,6 +9,10 @@ cursor_img = py.image.load("assets/cursor.png")
 cursor_img.set_colorkey(white)
 cursor_img.convert()
 
+
+#
+# BACKGROUNDS
+#
 bg_img = py.image.load("assets/battlefield.png")
 bg_img.set_colorkey(white)
 bg_img.convert()
@@ -21,6 +25,10 @@ loser_img = py.image.load("assets/loser.png")
 loser_img.set_colorkey(white)
 loser_img.convert()
 
+
+#
+# MENU ELEMENTS
+#
 bar_img = py.image.load("assets/upgrade_bar.png")
 bar_img.set_colorkey(white)
 bar_img.convert()
@@ -33,6 +41,14 @@ radius_upgrade_img = py.image.load("assets/upgrade_radius.png")
 radius_upgrade_img.set_colorkey(white)
 radius_upgrade_img.convert()
 
+diff_img = py.image.load("assets/diff.png")
+diff_img.set_colorkey(white)
+diff_img.convert()
+
+
+#
+# GAME ELEMENTS / ENTITIES
+#
 nuke_img = py.image.load("assets/nuke.png")
 nuke_img.set_colorkey(white)
 nuke_img = py.transform.scale_by(nuke_img, 0.5)
@@ -54,9 +70,13 @@ comet_img = py.image.load("assets/comet.png")
 comet_img.set_colorkey(white)
 comet_img.convert()
 
-diff_img = py.image.load("assets/diff.png")
-diff_img.set_colorkey(white)
-diff_img.convert()
+
+
+
+
+
+
+
 
 options_img = py.image.load("assets/Ability_Menu_BG.png")
 options_img.set_colorkey(white)
@@ -70,6 +90,6 @@ back_img = py.image.load("assets/back_arrow.png")
 back_img.set_colorkey(white)
 back_img.convert()
 
-death_img= py.image.load("assets/death_7.png")
+death_img = py.image.load("assets/death_7.png")
 death_img.set_colorkey(white)
 death_img.convert()

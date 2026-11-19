@@ -3,14 +3,12 @@ from load_assets import *
 import pygame as py
 from input_handler import InputHandler
 
-# one menu can contain multiple buttons
-# each button can only have one function
 
 class MenuSystem:
 	def __init__(self):
-		# self.tree = Tree(node_class=Menu)
 		self.active_menu = None
 		self.menus = []
+		self.data = {} # used to contain references to need data
 
 	def add_menu(self,menu):
 		self.menus.append(menu)
@@ -24,12 +22,16 @@ class MenuSystem:
 		blitQueue.append((self.active_menu.image,self.active_menu.pos))
 
 		for element in elements:
-			if left_click:
-				if element.rect.collidepoint(mouse_pos):
-					# print(f"Pressed a button!")
-					print(f"Button Parent: {element.target}")
-					self.active_menu = element.target
-					blitQueue.append((element.target.image,element.target.pos))
+			if left_click and element.rect.collidepoint(mouse_pos):
+				match element:
+					case MenuButton():
+						self.active_menu = element.target
+						blitQueue.append((element.target.image,element.target.pos))
+						
+					case FuncButton():
+						element.func(element.args)
+					case _:
+						continue
 
 			blitQueue.append((element.image,element.pos))
 
@@ -79,87 +81,94 @@ class MenuButton:
 		self.rect = img.get_rect()
 		self.rect.topleft = pos
 
-	# can be another menu reference or a function to call
-	def set_target(self,target):
-		pass
+	def update(self,mouse_pos):
+		return self.rect.collidepoint(mouse_pos)
+
 
 # button for performaing a preset function
 class FuncButton:
-	pass
+	def __init__(self,pos,func,img,args=None):
+		self.pos = pos
+		self.func = func
+		self.args = args # tuple [] of args for func, emepty if no args
+		self.image = img
+
+		self.rect = img.get_rect()
+		self.rect.topleft = pos
+
+start_menu = StaticMenu("Start",image=icon_img)
 
 
+# m1 = StaticMenu("Start",image=icon_img)
+# m2 = StaticMenu("Options",image=options_img)
+# m2a = StaticMenu("Graphics",image=empty_img)
+# m2b = StaticMenu("Keybinds",image=bar_img,pos=(0,800))
+# m3 = StaticMenu("Difficulty",image=loser_img)
+
+# m1_elements = [
+# 	MenuButton((500,500),m2,metal_img),
+# 	MenuButton((800,800),m3,death_img),
+# 	FuncButton((100,100),print,rubble_img,"fuck")
+# ]
+# m1.add_elements(m1_elements)
+
+# m2_elements = [
+# 	MenuButton((500,500),m2a,rubble_img),
+# 	MenuButton((700,500),m2b,normal_img),
+# 	MenuButton((100,100),m1,back_img)
+# ]
+# m2.add_elements(m2_elements)
+
+# m2a_elements = [
+# 	MenuButton((700,700),m2,speed_upgrade_img)
+# ]
+# m2a.add_elements(m2a_elements)
+
+# m2b_elements = [
+# 	MenuButton((700,700),m2,radius_upgrade_img)
+# ]
+# m2b.add_elements(m2b_elements)
+
+# m3_elements = [
+# 	MenuButton((500,500),m1,back_img)
+# ]
+# m3.add_elements(m3_elements)
+
+# m = MenuSystem()
+# m.add_menu(m1)
+# m.add_menu(m2)
+# m.add_menu(m2a)
+# m.add_menu(m2b)
+# m.add_menu(m3)
 
 
-
-m1 = StaticMenu("Start",image=icon_img)
-m2 = StaticMenu("Options",image=options_img)
-m2a = StaticMenu("Graphics",image=empty_img)
-m2b = StaticMenu("Keybinds",image=bar_img,pos=(0,800))
-m3 = StaticMenu("Difficulty",image=loser_img)
-
-m1_elements = [
-	MenuButton((500,500),m2,metal_img),
-	MenuButton((800,800),m3,death_img)
-]
-m1.add_elements(m1_elements)
-
-m2_elements = [
-	MenuButton((500,500),m2a,rubble_img),
-	MenuButton((700,500),m2b,normal_img),
-	MenuButton((100,100),m1,back_img)
-]
-m2.add_elements(m2_elements)
-
-m2a_elements = [
-	MenuButton((700,700),m2,speed_upgrade_img)
-]
-m2a.add_elements(m2a_elements)
-
-m2b_elements = [
-	MenuButton((700,700),m2,radius_upgrade_img)
-]
-m2b.add_elements(m2b_elements)
-
-m3_elements = [
-	MenuButton((500,500),m1,back_img)
-]
-m3.add_elements(m3_elements)
-
-m = MenuSystem()
-m.add_menu(m1)
-m.add_menu(m2)
-m.add_menu(m2a)
-m.add_menu(m2b)
-m.add_menu(m3)
+# py.init()
+# py.display.set_caption("menu testing")
+# screen = py.display.set_mode((1000,1000), 0, 32)
+# clock = py.time.Clock()
+# inputs = InputHandler()
+# blitQueue = []
 
 
-py.init()
-py.display.set_caption("menu testing")
-screen = py.display.set_mode((1000,1000), 0, 32)
-clock = py.time.Clock()
-inputs = InputHandler()
-blitQueue = []
+# debug = 0
+# run = True
+# while run:
+# 	screen.fill((0,0,0))
+# 	inputs.keys()
 
+# 	if debug < 120:
+# 		debug += 1
+# 	else:
+# 		debug = 0
 
-debug = 0
-run = True
-while run:
-	screen.fill((0,0,0))
-	inputs.keys()
+# 	m.update(inputs,blitQueue)
 
-	if debug < 120:
-		debug += 1
-	else:
-		debug = 0
+# 	screen.blits(blitQueue)
 
-	m.update(inputs,blitQueue)
-
-	screen.blits(blitQueue)
-
-	blitQueue.clear()
-	inputs.update()
-	py.display.update()
-	clock.tick(100)
+# 	blitQueue.clear()
+# 	inputs.update()
+# 	py.display.update()
+# 	clock.tick(100)
 
 
 

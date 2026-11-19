@@ -3,13 +3,10 @@ from pygame.locals import QUIT
 from python_event_bus import EventBus
 from enum import Enum
 
-class GameStates(Enum):
-	MENU = 1
-	IN_GAME = 2
-
 class InputHandler:
+	state = None
+
 	def __init__(self):
-		self.state = GameStates.MENU
 		self.diff = 1
 
 		self.left_mouse = False
@@ -82,16 +79,10 @@ class InputHandler:
 		self.mouse_pos = py.mouse.get_pos()
 
 		if not self.left_mouse and self.left_mouse_prev:
-			if self.state == GameStates.IN_GAME:
-				EventBus.call("left_click")
-			if self.state == GameStates.MENU:
-				EventBus.call("left_click_menu")
+			EventBus.call("left_click")
 
 		if not self.right_mouse and self.right_mouse_prev:
-			if self.state == GameStates.IN_GAME:
-				EventBus.call("right_click")
-			if self.state == GameStates.MENU:
-				EventBus.call("right_click_menu")
+			EventBus.call("right_click")
 
 		if not self.space and self.space_prev:
 			EventBus.call("space_click")

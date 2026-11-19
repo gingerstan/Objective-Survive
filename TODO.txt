@@ -38,3 +38,6 @@ The deck is split into three sub-decks labeled: early, middle, end.
 Only certain cards can go in each sub-deck. After certain time intervals
 in the match, the decks unlock. For example, early deck unlocks after
 30 seconds, middle after 90 second, and end after 150 seconds.
+
+
+Hidden fishing mini-game
