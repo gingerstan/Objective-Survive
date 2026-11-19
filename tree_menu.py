@@ -8,20 +8,20 @@ from input_handler import InputHandler
 
 class MenuSystem:
 	def __init__(self):
-		self.tree = Tree(node_class=Menu)
+		# self.tree = Tree(node_class=Menu)
 		self.active_menu = None
+		self.menus = []
 
-	def add_menu(self,menu,parent_name):
-		if self.tree.size():
-			self.tree.add_node(menu,parent=parent_name)
-		else:
-			self.tree.add_node(menu)
+	def add_menu(self,menu):
+		self.menus.append(menu)
+		if not self.active_menu:
 			self.active_menu = menu
 
 	def update(self,inputs,blitQueue):
 		elements = self.active_menu.elements
 		left_click = inputs.left_click()
 		mouse_pos = inputs.mouse_pos
+		blitQueue.append((self.active_menu.image,self.active_menu.pos))
 
 		for element in elements:
 			if left_click:
@@ -29,31 +29,24 @@ class MenuSystem:
 					# print(f"Pressed a button!")
 					print(f"Button Parent: {element.target}")
 					self.active_menu = element.target
-
+					blitQueue.append((element.target.image,element.target.pos))
 
 			blitQueue.append((element.image,element.pos))
 
 
 
-# Menu superclass
-class Menu(Node):
-	def __init__(self,menu_name,menu_id,parent=None):
-		super().__init__(menu_name,menu_id,parent)
-		self.elements = []
-
 # menu with a Static background image
-class StaticMenu(Menu):
-	def __init__(self,menu_name,menu_id,img=None,parent=None,pos=(0,0),data=None):
-		super().__init__(menu_name,menu_id,parent)
+class StaticMenu:
+	def __init__(self,menu_name,image=None,pos=(0,0),data=None):
+		self.elements = []
 		self.menu_name = menu_name
-		self.menu_id = menu_id
-		self.image = img
-		self.parent = parent
 		self.pos = pos
 		self.data = data # contains information the menu needs, like object references
 
-		self.rect = img.get_rect()
-		self.rect.center = pos
+		if image:
+			self.image = image
+			self.rect = image.get_rect()
+			self.rect.center = pos
 
 	# return image to add to blitQueue
 	def update(self):
@@ -65,14 +58,13 @@ class StaticMenu(Menu):
 			element.parent = self
 
 # menu with an animated background
-class AnimatedMenu(Menu):
-	def __init__(self,menu_name,menu_id,anim,pos=(0,0)):
-		super().__init__(menu_name,menu_id,pos)
-		self.img = anim
+# class AnimatedMenu:
+# 	def __init__(self,menu_name,menu_id,anim,pos=(0,0)):
+# 		self.img = anim
 
-	# return current anim frame to add to blitQueue
-	def update(self):
-		pass
+# 	# return current anim frame to add to blitQueue
+# 	def update(self):
+# 		pass
 
 
 
@@ -99,11 +91,11 @@ class FuncButton:
 
 
 
-m1 = StaticMenu("Start","root",icon_img)
-m2 = StaticMenu("Options","option",options_img)
-m2a = StaticMenu("Graphics","graphics",empty_img)
-m2b = StaticMenu("Keybinds","keybinds",bar_img)
-m3 = StaticMenu("Difficulty","difficulty",loser_img)
+m1 = StaticMenu("Start",image=icon_img)
+m2 = StaticMenu("Options",image=options_img)
+m2a = StaticMenu("Graphics",image=empty_img)
+m2b = StaticMenu("Keybinds",image=bar_img,pos=(0,800))
+m3 = StaticMenu("Difficulty",image=loser_img)
 
 m1_elements = [
 	MenuButton((500,500),m2,metal_img),
@@ -134,13 +126,11 @@ m3_elements = [
 m3.add_elements(m3_elements)
 
 m = MenuSystem()
-m.add_menu(m1,None)
-m.add_menu(m2,m1.identifier)
-m.add_menu(m2a,m2.identifier)
-m.add_menu(m2b,m2.identifier)
-m.add_menu(m3,m1.identifier)
-
-m.tree.show()
+m.add_menu(m1)
+m.add_menu(m2)
+m.add_menu(m2a)
+m.add_menu(m2b)
+m.add_menu(m3)
 
 
 py.init()
@@ -161,7 +151,6 @@ while run:
 		debug += 1
 	else:
 		debug = 0
-		# print(m.active_menu.menu_name)
 
 	m.update(inputs,blitQueue)
 

@@ -57,3 +57,19 @@ comet_img.convert()
 diff_img = py.image.load("assets/diff.png")
 diff_img.set_colorkey(white)
 diff_img.convert()
+
+options_img = py.image.load("assets/Ability_Menu_BG.png")
+options_img.set_colorkey(white)
+options_img.convert()
+
+empty_img = py.image.load("assets/empty_BG.png")
+empty_img.set_colorkey(white)
+empty_img.convert()
+
+back_img = py.image.load("assets/back_arrow.png")
+back_img.set_colorkey(white)
+back_img.convert()
+
+death_img= py.image.load("assets/death_7.png")
+death_img.set_colorkey(white)
+death_img.convert()

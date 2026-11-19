@@ -286,7 +286,7 @@ class Game:
 	def spawn_asteroids(threat_group):
 		# add new functions later to have different / random spawn configurations
 		a = [
-			# {"type":"asteroid","pos" : [500,-50],"hp" : 1,"dx" : 0.01,"dy" : 0.01,"img" : rubble_img }
+			# {"type":"asteroid","pos" : [500,-50],"hp" : 0,"dx" : 0,"dy" : 0,"img" : rubble_img }
 			{"type":"asteroid","pos" : [500,-50],"hp" : 5,"dx" : 0.5,"dy" : 1.2,"img" : normal_img },
 			{"type":"asteroid","pos" : [100,-50],"hp" : 12,"dx" : 0.3,"dy" : 0.7,"img" : metal_img },
 			{"type":"asteroid","pos" : [900,-50],"hp" : 3,"dx" : -0.5,"dy" : 1.1,"img" : rubble_img },
