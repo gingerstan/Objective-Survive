@@ -14,6 +14,8 @@ more abilities
 - auto laser cannons (low damage / range)
 on the menu screen, draw little missiles flying towards the asteroid
 
+redo missile hit detection -> rectangles suck
+
 
 alien ship boss
 - flies around erratically and shoots projectiles at Earth

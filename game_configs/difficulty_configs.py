@@ -10,46 +10,46 @@ class Difficulty(Enum):
 diff_configs = {
 	1 : {
 			"planet" : {
-				"planet_health" : 150
+				"planet_health" : 300
 			},
 			"threats" : {
 				"asteroid_spawn_rate_slope" : -0.004,
 				"asteroid_spawn_rate_mod" : 200 
 			},
 			"missiles" : {
-				"speed" : 3,
-				"radius" : 1.5,
-				"cooldown" : 60
+				"speed" : 10,
+				"radius" : 4,
+				"cooldown" : 20
 			}
 		},
 
 	2 : {
 			"planet" : {
-				"planet_health" : 125
+				"planet_health" : 200
 			},
 			"threats" : {
 				"asteroid_spawn_rate_slope" : -0.005,
 				"asteroid_spawn_rate_mod" : 190 
 			},
 			"missiles" : {
-				"speed" : 2.4,
-				"radius" : 0.9,
-				"cooldown" : 100
+				"speed" : 5,
+				"radius" : 1.5,
+				"cooldown" : 60
 			}
 		},
 
 	3 : {
 			"planet" : {
-				"planet_health" : 100
+				"planet_health" : 150
 			},
 			"threats" : {
 				"asteroid_spawn_rate_slope" : -0.006,
 				"asteroid_spawn_rate_mod" : 180
 			},
 			"missiles" : {
-				"speed" : 1.8,
-				"radius" : 0.5,
-				"cooldown" : 120
+				"speed" : 3,
+				"radius" : 1,
+				"cooldown" : 90
 			}
 		},
 
@@ -62,24 +62,24 @@ diff_configs = {
 				"asteroid_spawn_rate_mod" : 180
 			},
 			"missiles" : {
-				"speed" : 1.6,
-				"radius" : 0.4,
-				"cooldown" : 130
+				"speed" : 2.2,
+				"radius" : 0.7,
+				"cooldown" : 110
 			}
 		},
 
 	5 : {
 			"planet" : {
-				"planet_health" : 10
+				"planet_health" : 30
 			},
 			"threats" : {
 				"asteroid_spawn_rate_slope" : -0.01,
 				"asteroid_spawn_rate_mod" : 170 
 			},
 			"missiles" : {
-				"speed" : 1.4,
-				"radius" : 0.3,
-				"cooldown" : 150
+				"speed" : 1.8,
+				"radius" : 0.4,
+				"cooldown" : 120
 			}
 		}
 

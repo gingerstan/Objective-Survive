@@ -15,13 +15,14 @@ from animation import load_number_sequence
 from round_variables import RoundVariables
 from game_configs.difficulty_configs import *
 from gui import Button
+from menu_elements import main_menu
+from menu_elements import in_game_menu
 from abilities.ability_handler import AbilityHandler as AH
 from threats.threat_handler import ThreatHandler as TH
 from abilities.missile import Missile
 from abilities.rapid_fire import RapidFire
 from threats.asteroid import Normal
 from threats.comet import Comet
-
 
 from load_assets import screen
 from load_assets import cursor_img
@@ -102,7 +103,7 @@ class Game:
 			self.screen.fill((0,0,0))
 			self.screen.blit(bg_img,(0,0))
 			self.inputs.keys()
-			self.check_game_buttons()
+			in_game_menu.update(self.inputs,self.blitQueue)
 
 			now = time.time()
 			self.vars.dt = now - prev_time
@@ -133,14 +134,11 @@ class Game:
 					in_game = False
 					logger.info(f"Scored: {self.vars.score}, Difficulty: {Difficulty(self.vars.diff).name}") # add length / abilities used in game to stats
 					logger.debug(f"Average FPS: {avg_fps}")
-			else:
-				# check buttons now handled on BusEvent "left_click"
-				pass
 
 
 			# end menu pause ##########################################################
 
-			self.draw_game_gui(vars)
+			self.display_score(self.vars.score,False)
 			Animation.play_all(self.blitQueue)
 			
 			AH.AA.draw(self.screen)
@@ -156,16 +154,12 @@ class Game:
 
 
 	def draw_game_gui(self,vars):
-		self.screen.blit(bar_img,(0,800))
-		self.screen.blit(speed_upgrade_img,(50,830))
-		self.screen.blit(radius_upgrade_img,(50,900))
 		py.draw.rect(self.screen,(255,0,0),(850,900,self.vars.planet_health * self.vars.hp_gui_factor,60))
 		py.draw.rect(self.screen,(0,255,0),(850,820, (Missile.COOLDOWN - Missile.TIMER.time) * (100/Missile.COOLDOWN),60))
 
 		# if self.inputs.mouse_pos[1] < 800:
 		# 	py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
 
-		self.display_score(self.vars.score,False)
 
 
 	@EventBus.on("update_spawn_rate")
@@ -182,7 +176,6 @@ class Game:
 		# for abil in AH.AA:
 		# 	py.draw.rect(self.screen,(255,255,255),abil.rect)
 			
-
 		hits = py.sprite.groupcollide(AH.AA, TH.GROUP, False, False)
 		if hits:
 			for abil,threat_array in hits.items():
@@ -196,38 +189,20 @@ class Game:
 						break
 
 
-	def check_game_buttons(self):
-		if self.inputs.shift:
-			speed_rect = py.Rect(50,830,150,50)
-			radius_rect = py.Rect(50,900,150,50)
-
-			if speed_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
-				EventBus.call("upgrade_speed")
-			elif radius_rect.collidepoint(self.inputs.mouse_pos) and self.inputs.left_click():
-				EventBus.call("upgrade_radius")
-		else:
-			pass
-
-
 	def main_menu(self):
 		AH.STATE = GameStates.START_MENU
 		g.state = GameStates.START_MENU
 		nums = load_number_sequence()
 
-		in_menu = True
-		while in_menu:
+		while g.state == GameStates.START_MENU:
 			self.screen.fill((0,0,0))
 			self.screen.blit(icon_img,(0,0))
 			self.inputs.keys()
 
-			Button.update()
+			main_menu.update(self.inputs,self.blitQueue)
 
-			Button.ALL_BUTTONS[0].img = nums[self.inputs.diff]
-
-			if self.inputs.space_bar_click():
-				in_menu = False
-
-			Button.draw(self.screen)
+			self.screen.blits(self.blitQueue)
+			self.blitQueue.clear()
 			self.inputs.update()
 			py.display.update()
 			self.clock.tick(self.framerate)
@@ -255,7 +230,7 @@ class Game:
 			py.display.update()
 			self.clock.tick(self.framerate)
 
-		g.state = GameStates.MENU
+		g.state = GameStates.START_MENU
 
 
 	def display_score(self,score,end):
@@ -286,14 +261,16 @@ class Game:
 			self.screen.blit(img,pos)
 			digit += 1
 
+	@EventBus.on("enter_game")
+	def enter_game():
+		g.state = GameStates.IN_GAME
 
 	@EventBus.on("update_difficulty")
-	def update_difficulty(inputs):
-		if inputs.diff < 5:
-			inputs.diff += 1
-		elif inputs.diff == 5:
-			inputs.diff = 1
-
+	def update_difficulty():
+		if g.inputs.diff < 5:
+			g.inputs.diff += 1
+		elif g.inputs.diff == 5:
+			g.inputs.diff = 1
 
 	@EventBus.on("spawn_asteroid")
 	def spawn_asteroids():

@@ -29,6 +29,11 @@ loser_img.convert()
 #
 # MENU ELEMENTS
 #
+play_img = py.image.load("assets/play.png")
+play_img.set_colorkey(white)
+play_img.convert()
+
+
 bar_img = py.image.load("assets/upgrade_bar.png")
 bar_img.set_colorkey(white)
 bar_img.convert()
@@ -44,6 +49,15 @@ radius_upgrade_img.convert()
 diff_img = py.image.load("assets/diff.png")
 diff_img.set_colorkey(white)
 diff_img.convert()
+
+open_upgrade_menu_img = py.image.load("assets/open_upgrade_menu.png")
+open_upgrade_menu_img.set_colorkey(white)
+open_upgrade_menu_img.convert()
+open_upgrade_menu_img = py.transform.scale_by(open_upgrade_menu_img,1.3)
+
+blank_ability_img = py.image.load("assets/blank_ability.png")
+blank_ability_img.set_colorkey(white)
+blank_ability_img.convert()
 
 
 #
