@@ -4,6 +4,7 @@ white = (255,255,255)
 class Animation:
 	ALL_ANIMATIONS = []
 	SCREEN = None
+	HIDDEN = False
 
 	def __init__(self, seq_prefix, pos, colorkey=(255,255,255), scale=1, angle=0, loop=False):
 		Animation.ALL_ANIMATIONS.append(self)
@@ -37,7 +38,8 @@ class Animation:
 
 	def play(self, blitQueue):
 		if self.frame_num < self.num_of_frames:
-			blitQueue.append((self.frames[self.frame_num],self.pos))
+			if not Animation.HIDDEN:
+				blitQueue.append((self.frames[self.frame_num],self.pos))
 			if self.sub_frame_num < self.frame_time:
 				self.sub_frame_num += 1
 			else:
@@ -58,6 +60,11 @@ class Animation:
 	def remove_anim(anim):
 		Animation.ALL_ANIMATIONS.remove(anim)
 
+	def hide():
+		Animation.HIDDEN = True
+
+	def show():
+		Animation.HIDDEN = False
 
 
 def load_image_sequence(seq_prefix, num_of_frames,colorkey=(255,255,255)):

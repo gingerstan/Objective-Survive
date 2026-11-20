@@ -113,6 +113,7 @@ class Game:
 
 			# pauses entities so player can use upgrade menu ##########################
 			if not self.inputs.shift:
+				Animation.show()
 				# if debug_count < 120:
 				# 	debug_count += 1
 				# else:
@@ -125,47 +126,49 @@ class Game:
 				TH.GROUP.update()
 				self.vars.frames += 1
 
-				if self.vars.planet_health < 1:
-					avg_fps = 0
-					for frame in self.fps:
-						avg_fps += frame
-					avg_fps = avg_fps / len(self.fps)
-
-					in_game = False
-					logger.info(f"Scored: {self.vars.score}, Difficulty: {Difficulty(self.vars.diff).name}") # add length / abilities used in game to stats
-					logger.debug(f"Average FPS: {avg_fps}")
-
+				in_game = self.check_if_dead()
+			else:
+				Animation.hide()
 
 			# end menu pause ##########################################################
 
-			self.display_score(self.vars.score,False)
-			Animation.play_all(self.blitQueue)
+			self.all_the_updates()
 			
-			AH.AA.draw(self.screen)
-			TH.GROUP.draw(self.screen)
-			self.screen.blits(self.blitQueue)
 
-			self.inputs.update()
-			py.display.update()
-			self.blitQueue.clear()
-			self.clock.tick(self.framerate)
+	def all_the_updates(self):
+		self.display_score(self.vars.score,False)
+		Animation.play_all(self.blitQueue)
+		
+		AH.AA.draw(self.screen)
+		TH.GROUP.draw(self.screen)
+		self.screen.blits(self.blitQueue)
 
-			self.fps.append(self.clock.get_fps())
+		self.inputs.update()
+		py.display.update()
+		self.blitQueue.clear()
+		self.clock.tick(self.framerate)
 
+		self.fps.append(self.clock.get_fps())
+
+	def check_if_dead(self):
+		if self.vars.planet_health < 1:
+			avg_fps = 0
+			for frame in self.fps:
+				avg_fps += frame
+			avg_fps = avg_fps / len(self.fps)
+
+			logger.info(f"Scored: {self.vars.score}, Difficulty: {Difficulty(self.vars.diff).name}") # add length / abilities used in game to stats
+			logger.debug(f"Average FPS: {avg_fps}")
+
+			return False
+		return True
 
 	def draw_game_gui(self,vars):
 		py.draw.rect(self.screen,(255,0,0),(850,900,self.vars.planet_health * self.vars.hp_gui_factor,60))
 		py.draw.rect(self.screen,(0,255,0),(850,820, (Missile.COOLDOWN - Missile.TIMER.time) * (100/Missile.COOLDOWN),60))
 
-		# if self.inputs.mouse_pos[1] < 800:
-		# 	py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
-
-
-
-	@EventBus.on("update_spawn_rate")
-	def update_spawn_rate(args):
-		args[0].period = (g.vars.ast_spawn_slope*g.vars.frames) + g.vars.ast_spawn_mod
-
+		if self.inputs.mouse_pos[1] < 800:
+			py.draw.line(self.screen, (255,0,0), (500,700), self.inputs.mouse_pos, 3)
 
 	def check_collisions(self, vars):
 		for threat in TH.GROUP:
@@ -271,6 +274,10 @@ class Game:
 			g.inputs.diff += 1
 		elif g.inputs.diff == 5:
 			g.inputs.diff = 1
+
+	@EventBus.on("update_spawn_rate")
+	def update_spawn_rate(args):
+		args[0].period = (g.vars.ast_spawn_slope*g.vars.frames) + g.vars.ast_spawn_mod
 
 	@EventBus.on("spawn_asteroid")
 	def spawn_asteroids():

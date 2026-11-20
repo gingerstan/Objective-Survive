@@ -4,12 +4,13 @@ import pygame as py
 from input_handler import InputHandler
 from python_event_bus import EventBus
 
-
 class MenuSystem:
 	def __init__(self):
 		self.active_menu = None
 		self.menus = []
 		self.data = {} # used to contain references to need data
+
+		self.menu_elements = []
 
 	def add_menu(self,menu):
 		self.menus.append(menu)
@@ -21,22 +22,29 @@ class MenuSystem:
 		left_click = inputs.left_click()
 		mouse_pos = inputs.mouse_pos
 
-		if hasattr(self.active_menu,"image"):
-			blitQueue.append((self.active_menu.image,self.active_menu.pos))
+		blitQueue.append((self.active_menu.image,self.active_menu.pos))
+		
+		# if len(self.menu_elements):
+		# 	blitQueue.append(self.menu_elements[-1])
+		# 	blitQueue.extend((x.image,x.pos) for x in self.menu_elements[-1] if hasattr(x,"image"))
+		blitQueue.extend(self.menu_elements)
 
 		for element in elements:
 			if left_click and element.rect.collidepoint(mouse_pos):
 				match element:
 					case MenuButton():
 						if element.keep_prev_menu:
-							blitQueue.append((self.active_menu.image.copy(),self.active_menu.pos.copy()))
+							self.menu_elements.append((self.active_menu.image.copy(),self.active_menu.pos.copy()))
+							self.menu_elements.extend((x.image,x.pos) for x in self.active_menu.elements if hasattr(x,"image"))
+						else:
+							self.menu_elements.clear()
 							
 						self.active_menu = element.target
 						if hasattr(element.target,"image"):
 							blitQueue.append((element.target.image,element.target.pos))
 			
 					case FuncButton():
-						element.update(element.args)
+						element.update()
 					case _:
 						continue
 
@@ -51,11 +59,7 @@ class StaticMenu:
 		self.menu_name = menu_name
 		self.pos = pos
 		self.data = data # contains information the menu needs, like object references
-
-		if image:
-			self.image = image
-			self.rect = image.get_rect()
-			self.rect.center = pos
+		self.image = image
 
 	# return image to add to blitQueue
 	def update(self):
@@ -104,7 +108,7 @@ class FuncButton:
 		self.rect = img.get_rect()
 		self.rect.topleft = pos
 
-	def update(self,*args):
+	def update(self):
 		EventBus.call(self.func)
 
 
