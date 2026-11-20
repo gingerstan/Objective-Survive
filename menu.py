@@ -109,7 +109,10 @@ class FuncButton:
 		self.rect.topleft = pos
 
 	def update(self):
-		EventBus.call(self.func)
+		if self.args:
+			EventBus.call(self.func,self.args)
+		else:
+			EventBus.call(self.func)
 
 
 

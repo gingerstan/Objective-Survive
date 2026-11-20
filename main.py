@@ -110,8 +110,6 @@ class Game:
 			prev_time = now
 			self.vars.dt *= self.framerate
 
-
-			# pauses entities so player can use upgrade menu ##########################
 			if not self.inputs.shift:
 				Animation.show()
 				# if debug_count < 120:
@@ -130,10 +128,10 @@ class Game:
 			else:
 				Animation.hide()
 
-			# end menu pause ##########################################################
-
 			self.all_the_updates()
 			
+	### END GAME LOOP ###################################
+
 
 	def all_the_updates(self):
 		self.display_score(self.vars.score,False)
@@ -269,11 +267,12 @@ class Game:
 		g.state = GameStates.IN_GAME
 
 	@EventBus.on("update_difficulty")
-	def update_difficulty():
+	def update_difficulty(data):
 		if g.inputs.diff < 5:
 			g.inputs.diff += 1
 		elif g.inputs.diff == 5:
 			g.inputs.diff = 1
+		data[0].image = data[1][g.inputs.diff]
 
 	@EventBus.on("update_spawn_rate")
 	def update_spawn_rate(args):
