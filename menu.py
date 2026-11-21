@@ -12,6 +12,9 @@ class MenuSystem:
 
 		self.menu_elements = []
 
+		self.clickable_types = [MenuButton,FuncButton]
+		self.non_clickable_types = [StatBar]
+
 	def add_menu(self,menu):
 		self.menus.append(menu)
 		if not self.active_menu:
@@ -23,32 +26,38 @@ class MenuSystem:
 		mouse_pos = inputs.mouse_pos
 
 		blitQueue.append((self.active_menu.image,self.active_menu.pos))
-		
-		# if len(self.menu_elements):
-		# 	blitQueue.append(self.menu_elements[-1])
-		# 	blitQueue.extend((x.image,x.pos) for x in self.menu_elements[-1] if hasattr(x,"image"))
 		blitQueue.extend(self.menu_elements)
 
+		
 		for element in elements:
-			if left_click and element.rect.collidepoint(mouse_pos):
-				match element:
-					case MenuButton():
-						if element.keep_prev_menu:
-							self.menu_elements.append((self.active_menu.image.copy(),self.active_menu.pos.copy()))
-							self.menu_elements.extend((x.image,x.pos) for x in self.active_menu.elements if hasattr(x,"image"))
-						else:
-							self.menu_elements.clear()
-							
-						self.active_menu = element.target
-						if hasattr(element.target,"image"):
-							blitQueue.append((element.target.image,element.target.pos))
-			
-					case FuncButton():
-						element.update()
-					case _:
-						continue
+			append = True
+			if type(element) in self.clickable_types:
+				if left_click and element.rect.collidepoint(mouse_pos):
+					match element:
+						case MenuButton():
+							if element.keep_prev_menu:
+								self.menu_elements.append((self.active_menu.image,self.active_menu.pos))
+								self.menu_elements.extend((x.image,x.pos) for x in self.active_menu.elements if hasattr(x,"image"))
+							else:
+								self.menu_elements.clear()
+								
+							self.active_menu = element.target
+							if hasattr(element.target,"image"):
+								blitQueue.append((element.target.image,element.target.pos))
+				
+						case FuncButton():
+							element.update()
 
-			blitQueue.append((element.image,element.pos))
+						case _:
+							continue
+
+			else:
+				if type(element) == StatBar:
+					element.update()
+					append = False
+
+			if append:
+				blitQueue.append((element.image,element.pos))
 
 
 
@@ -78,8 +87,6 @@ class StaticMenu:
 # 	# return current anim frame to add to blitQueue
 # 	def update(self):
 # 		pass
-
-
 
 
 # button for changing menus
@@ -115,6 +122,41 @@ class FuncButton:
 			EventBus.call(self.func)
 
 
+class StatBar:
+	SCREEN = None
+	BLITQUEUE = None
+	def __init__(self,pos,img,stat_ref,max_value,color,start_value=0,min_value=0):
+		self.pos = pos
+		self.image = img
+		self.stat_ref = stat_ref
+		self.max_value = max_value
+		self.color = color
+		
+		self.value = start_value if start_value else max_value
+		self.min_value = min_value
+		self.prev_value = 0
+
+		self.img_width = int(img.get_width())
+		self.img_height = int(img.get_height())
+
+		self.surf = None
+
+	# for better bar texture, make a background image for it 
+	# with the desired texture, then cut a subsurface from it.
+	def update(self):
+		if self.value != self.prev_value:
+			# print(f"{self.max_value}, {self.value}")
+			bar_length = (self.value / self.max_value) * self.img_width
+			surf = py.surface.Surface((bar_length,self.img_height))
+			surf.fill(self.color)
+			# print(f"{bar_length}, {self.img_width}, {self.img_height}, {self.pos}")
+			self.surf = surf
+		
+		StatBar.BLITQUEUE.append((self.image,self.pos))
+		StatBar.BLITQUEUE.append((self.surf,self.pos))
+
+			
+			
 
 # py.init()
 # py.display.set_caption("menu testing")

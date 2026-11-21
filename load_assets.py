@@ -33,7 +33,6 @@ play_img = py.image.load("assets/play.png")
 play_img.set_colorkey(white)
 play_img.convert()
 
-
 bar_img = py.image.load("assets/upgrade_bar.png")
 bar_img.set_colorkey(white)
 bar_img.convert()
@@ -58,6 +57,19 @@ open_upgrade_menu_img = py.transform.scale_by(open_upgrade_menu_img,1.3)
 blank_ability_img = py.image.load("assets/blank_ability.png")
 blank_ability_img.set_colorkey(white)
 blank_ability_img.convert()
+
+budget_img = py.image.load("assets/budget.png")
+budget_img.set_colorkey(white)
+budget_img.convert()
+budget_img = py.transform.scale_by(budget_img,1.3)
+
+basic_menu_img = py.image.load("assets/basic_menu.png")
+basic_menu_img.set_colorkey(white)
+basic_menu_img.convert()
+
+health_bar_img = py.image.load("assets/health_bar.png")
+health_bar_img.set_colorkey(white)
+health_bar_img.convert()
 
 
 #

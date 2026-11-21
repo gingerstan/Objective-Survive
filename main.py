@@ -17,12 +17,14 @@ from game_configs.difficulty_configs import *
 from gui import Button
 from menu_elements import main_menu
 from menu_elements import in_game_menu
+from menu import StatBar
 from abilities.ability_handler import AbilityHandler as AH
 from threats.threat_handler import ThreatHandler as TH
 from abilities.missile import Missile
 from abilities.rapid_fire import RapidFire
 from threats.asteroid import Normal
 from threats.comet import Comet
+
 
 from load_assets import screen
 from load_assets import cursor_img
@@ -36,6 +38,7 @@ from load_assets import metal_img
 from load_assets import comet_img
 from load_assets import icon_img
 from load_assets import loser_img
+
 
 
 logging.basicConfig(
@@ -69,11 +72,12 @@ class Game:
 		self.blitQueue = []
 		
 		self.inputs = IH()
-		self.inputs.state = Game.state
-
+		self.inputs.state = Game.state # make function that updates game state everywhere when changed
 		AH.setup_abilities(self.inputs)
 		self.vars = RoundVariables(1)
 
+		StatBar.SCREEN = self.screen
+		StatBar.BLITQUEUE = self.blitQueue
 		Button.KEYS = self.inputs
 
 		self.fps = [] # for performance testing
@@ -104,6 +108,10 @@ class Game:
 			self.screen.blit(bg_img,(0,0))
 			self.inputs.keys()
 			in_game_menu.update(self.inputs,self.blitQueue)
+
+			s = py.surface.Surface((100,100))
+			s.fill((0,255,0))
+			self.blitQueue.append((s,(10,10)))
 
 			now = time.time()
 			self.vars.dt = now - prev_time
@@ -170,6 +178,7 @@ class Game:
 
 	def check_collisions(self, vars):
 		for threat in TH.GROUP:
+			# py.draw.rect(self.screen,(255,255,255),threat.rect)
 			if threat.pos[1] > 750:
 				threat.hit_planet(self.vars)
 				pass

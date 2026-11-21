@@ -1,6 +1,8 @@
 currency to make abilities cost something
 game timer
 better GUI
+better missile hit detection
+better spawn systems, no comets at start
 - Ammunition recharge bar
 - missile magazine state
 - planet health bar
